@@ -2,13 +2,17 @@
 
 ## Goal
 
-Add native Ukrainian (`ukua`) language support to OpenEVV, expanding the engine's multi-language capacity, implementing full Cyrillic UTF-8 input handling, integrating phoneme definitions and letter-to-sound rules derived from eSpeak NG and RHVoice, and configuring GitHub Actions CI to handle automated cloud compilation and artifact delivery.
+Add native Ukrainian (`ukua`) language support to OpenEVV, expanding the engine's multi-language capacity, implementing full Cyrillic UTF-8 input handling, integrating phoneme definitions and pronunciation rules derived from RHVoice, incorporating the 2.9+ million word stress dictionary from `lang-uk/ukrainian-word-stress-dictionary`, and leveraging GitHub Actions CI for all heavy compilation, dataset fetching, and artifact generation.
 
-## Background and Motivation
+## Background and Decisions
 
-OpenEVV currently supports 10 languages: 9 shipped by IBM (US/UK English, Castilian/Latin American Spanish, French, Canadian French, German, Italian, Japanese) and 1 added independently without IBM objects (Polish, `lang/plpl`).
+OpenEVV currently supports 10 languages (9 from IBM plus Polish `lang/plpl`).
 
-The user intends to add several new languages, starting with Ukrainian, utilizing eSpeak NG and RHVoice phoneme data and pronunciation models. Furthermore, because local compile resources and internet bandwidth are constrained, the build and verification process must leverage GitHub Actions CI to produce standalone binaries and library artifacts.
+Based on user requirements:
+- **No eSpeak NG**: All phoneme definitions and letter-to-sound (G2P) logic are derived from **RHVoice** Ukrainian phonetic models.
+- **Stress & Lexicon**: The primary lexicon and word stress data comes from **`lang-uk/ukrainian-word-stress-dictionary`** (over 2.9 million word forms with explicit combining acute accent `\u0301` markings).
+- **Cloud-First Compilation (GitHub Actions CI)**: Due to local internet bandwidth constraints, dataset downloads (like the 2.9M word stress dictionary), rule compilation, and binary builds (`probe.exe`, `eci.dll`, audio samples) are executed on GitHub Actions runners, producing downloadable artifacts.
+- **Comprehensive Commit & Progress Tracking**: Every single step is committed to git, accompanied by detailed progress documentation files so anyone can inspect or resume progress at any time.
 
 ## Engine Architecture Changes
 
@@ -43,6 +47,7 @@ The Delta virtual machine operates on single bytes (0x00 to 0xFF). Incoming Ukra
   - Lowercase: `а, б, в, г, ґ, д, е, є, ж, з, и, і, ї, й, к, л, м, н, о, п, р, с, т, у, ф, х, ц, ч, ш, щ, ь, ю, я`
   - Uppercase: `А, Б, В, Г, Ґ, Д, Е, Є, Ж, З, И, І, Ї, Й, К, Л, М, Н, О, П, Р, С, Т, У, Ф, Х, Ц, Ч, Ш, Щ, Ь, Ю, Я`
   - Orthographic modifiers: Ukrainian apostrophe `ʼ` (U+02BC / U+2019 / U+0027) and hyphen `-`.
+  - Stress accent modifier: Combining acute accent `\u0301` (U+0301) handled during preprocessing/recoding.
 - **Codepoint Mapping (`ukua.codepoints`):**
   - Maps Unicode Cyrillic codepoints (U+0400 to U+045F and related) into allocated bytes in the range `0x80` to `0xE0`.
   - Compiled via `make EVVLANG=lang/ukua codepoints` to emit `delta_codepoints_ukua.c`.
@@ -50,9 +55,9 @@ The Delta virtual machine operates on single bytes (0x00 to 0xFF). Incoming Ukra
   - Managed via `tools/module/alphabet.py`.
   - Classifies each Cyrillic character by case, character type (letter/punct), phonetic class (vowel, consonant, glide), and individual fallback phoneme.
 
-### 2. Phoneme Inventory and Formant Synthesis
+### 2. Phoneme Inventory and Formant Synthesis (RHVoice Model)
 
-Ukrainian phonemes are mapped to Eloquence Klatt cascade synthesis formant targets:
+Ukrainian phonemes are modeled following RHVoice's Ukrainian phonetics mapped to Eloquence Klatt cascade synthesis formant targets:
 
 - **Monophthong Vowels (6):**
   - `/a/` (`a`): F1 ~750 Hz, F2 ~1250 Hz, F3 ~2400 Hz
@@ -62,9 +67,9 @@ Ukrainian phonemes are mapped to Eloquence Klatt cascade synthesis formant targe
   - `/ɔ/` (`o`): F1 ~500 Hz, F2 ~950 Hz, F3 ~2400 Hz
   - `/u/` (`u`): F1 ~300 Hz, F2 ~800 Hz, F3 ~2200 Hz
 - **Iotated Vowels:**
-  - `я` (`j'a`), `ю` (`j'u`), `є` (`j'E`), `ї` (`j'i:`)
+  - `я` (`j'a`), `ю` (`j'u`), `є` (`j'e`), `ї` (`j'i`)
 - **Consonants & Loci (`rules/is_val.up`):**
-  - Labials (`b, p, v/B, m, f`): F2 locus ~850 Hz
+  - Labials (`b, p, v/w, m, f`): F2 locus ~850 Hz
   - Dentals/Alveolars (`d, t, z, s, n, l, r`): F2 locus ~1700 Hz
   - Velars (`g, k, x`): F2 locus ~1700-2400 Hz
   - Glottal/Pharyngeal (`h` / Ukrainian `г` / /ɦ/): voiced low-frequency fricative
@@ -76,25 +81,33 @@ Ukrainian phonemes are mapped to Eloquence Klatt cascade synthesis formant targe
 
 ### 3. G2P Rules and Lexicon Pipeline
 
-- **Delta Rules (`lang/ukua/rules/`):**
-  - Digest Ukrainian orthographic conventions:
-    - Digraph expansion (`дж` -> `/dʒ/`, `дз` -> `/dz/`)
-    - Palatalization trigger on soft sign `ь`
-    - Iotated vowel decomposition: `j + vowel` at start of word, after vowel, or after apostrophe; palatalization of preceding consonant when following a consonant
-    - Word-final devoicing and consonant cluster assimilation
+- **RHVoice G2P Rules (`lang/ukua/rules/`):**
+  - Digraph expansion (`дж` -> `/dʒ/`, `дз` -> `/dz/`)
+  - Palatalization trigger on soft sign `ь`
+  - Iotated vowel decomposition: `j + vowel` at start of word, after vowel, or after apostrophe; palatalization of preceding consonant when following a consonant
+  - Word-final devoicing and consonant cluster assimilation
 - **Dictionary Compilation (`ukua.dict` and `ukua.sets`):**
-  - Extracted from eSpeak NG (`uk_rules`, `uk_list`) and cross-checked with RHVoice Ukrainian dictionary tables for high-accuracy stress placement.
-  - Converted into OpenEVV binary sets via `tools/module/dict.py`.
+  - Sourced from `lang-uk/ukrainian-word-stress-dictionary` (`stress.txt` containing 2.9M entries).
+  - A cloud CI compilation step extracts the high-frequency and baseline vocabulary into `ukua.dict` and generates `ukua.sets` via `tools/module/dict.py`.
 
 ## GitHub Actions CI and Cloud Compilation
 
 To address local bandwidth and computational limits:
 - **CI Workflow Updates (`.github/workflows/build.yml`):**
-  - Include `lang/ukua` in the multi-language build targets:
+  - Fetch `lang-uk/ukrainian-word-stress-dictionary` and RHVoice data in the CI runner.
+  - Compile `ukua` in bytecode and C modes:
     `make -j"$(nproc)" RULES=c EVVPLAIN=1 LANGS="lang/enus lang/plpl lang/ukua" so all`
-  - Add standalone Ukrainian build checks:
+  - Run standalone Ukrainian probe checks:
     `make -j"$(nproc)" LANG=lang/ukua probe`
-  - Upload build output artifacts (Linux shared library `libeci.so`, Windows binaries `probe.exe`, `eci.dll`, and test WAV files) directly to GitHub Actions Artifacts for single-click download.
+  - Package and upload build output artifacts (Linux shared library `libeci.so`, Windows binaries `probe.exe`, `eci.dll`, test audio samples) to GitHub Actions Artifacts for download.
+
+## Progress Tracking and Documentation
+
+- Maintain an ongoing, detailed progress log at `docs/progress/ukua-progress.md` with:
+  - Completed steps, current status, and exact commands.
+  - File changes and their rationale.
+  - Instructions for resuming or verifying from any state.
+- Strict git commit discipline: every milestone, refactor, and step is committed individually with clear messages.
 
 ## Verification and Testing Plan
 
@@ -102,11 +115,11 @@ To address local bandwidth and computational limits:
    - Verify `FAMILIES` expansion compiles cleanly without regressions across all existing 10 languages.
    - Verify `lang/ukua` tables (`ukua.globals`, `ukua.settings`, `ukua.statements`, `ukua.sets`, `ukua.consts`, `ukua.codepoints`) generate valid C code via `make LANG=lang/ukua tables-write`.
 2. **Phonetic and Audio Verification:**
-   - Verify `build/probe "привіт" out.wav p` outputs expected phoneme stream matching eSpeak NG/RHVoice.
+   - Verify `build/probe "привіт" out.wav p` outputs expected phoneme stream matching RHVoice.
    - Speak representative phrases:
      - Greetings: `"Добрий день"`, `"Привіт"`
      - Punctuation and apostrophe: `"п'ять"`, `"м'ясо"`
      - Palatalization: `"день"`, `"сіль"`, `"любов"`
-     - Alphabet pangram / coverage sentences.
+     - Alphabet coverage.
 3. **Regression Testing:**
    - Execute existing test suite: `test/hash.sh` and `make crashers` must remain 100% green.
