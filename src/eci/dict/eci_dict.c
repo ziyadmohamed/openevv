@@ -44,7 +44,7 @@
    one nothing ever reads. */
 #define ACTIVE_DICT(h, family, dialect) \
     (*(evv_ref *)((char *)(h) + 0x60c + (family) * 8 + (dialect) * 4))
-#define DICT_FAMILIES   0x20
+#define DICT_FAMILIES   19
 #define DICT_DIALECTS   2
 
 #define ENV_LANGUAGE    9
@@ -197,7 +197,7 @@ int32_t ed_deactivate_all_dicts(OldInst *h)
 {
     int family, dialect;
 
-    for (family = 1; family <= DICT_FAMILIES; family++)
+    for (family = 1; family < DICT_FAMILIES; family++)
         for (dialect = 0; dialect < DICT_DIALECTS; dialect++) {
             void *dict = EVV_AT(void *, ACTIVE_DICT(h, family, dialect));
 

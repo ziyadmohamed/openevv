@@ -23,7 +23,7 @@ This document tracks the end-to-end development, architecture decisions, current
 ## Development Roadmap & Status
 
 ### Phase 1: Engine Multi-Language Scalability
-- [x] Expand `FAMILIES`, `DICT_FAMILIES`, `RM_FAMILIES`, `ROM_FAMILIES` from 18 to 32 in core engine headers and C files.
+- [x] Expand engine family capacity: FAMILIES to 32 in statics and voicetable, RM_FAMILIES and ROM_FAMILIES to 32 with resized RomanizerManager arrays, and DICT_FAMILIES to 19 (safely bounding ed_deactivate_all_dicts within OldInst).
 - [x] Register `ukua` in `tools/module/gather.py`.
 - [x] Verify zero regressions in existing 10 languages.
 

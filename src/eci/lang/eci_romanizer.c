@@ -41,17 +41,20 @@
 #include "delta_lang.h"
 #include "eci_rom.h"
 
+#define RM_FAMILIES  0x20
+#define RM_DIALECTS  2
+
 typedef struct SynthThread SynthThread;
 
-/* The manager's own record. The two arrays are eighteen language families
+/* The manager's own record. The two arrays are language families
    of two dialects each: one of romanizers held open, one of the names they
    were loaded from. */
 typedef struct RomanizerManager {
     uint8_t       lock[0x0c];   /* +0x000 */
     IniFileReader ini;          /* +0x00c */
-    /* Eighteen language families of two dialects each: one array of the names
+    /* Language families of two dialects each: one array of the names
        the romanizers were loaded from, one of the romanizers themselves. */
-    char         *names[0x12][2];   /* +0x130 */
+    char         *names[RM_FAMILIES + 1][RM_DIALECTS];
     /* Where IBM keeps the address of getRomObject, which it fetches every
        time it is about to ask for a romanizer. Ours keeps the maker that
        answered for the family being asked about, which is the same thing
@@ -62,7 +65,7 @@ typedef struct RomanizerManager {
     int32_t       stopped;          /* +0x1cc */
     /* Indexed by a one-based family number, which is why the original's own
        two users of it disagree by eight about where it starts. */
-    EvvRom       *roms[0x12][2];    /* +0x1d0 */
+    EvvRom       *roms[RM_FAMILIES][RM_DIALECTS];
     SynthThread  *thread;           /* +0x260 */
     int32_t       family;           /* +0x264 */
     int32_t       dialect;          /* +0x268 */
@@ -89,8 +92,6 @@ const uint32_t rm_bytes = sizeof(RomanizerManager);
 #define RM_OUT(m)         ((m)->out)
 #define RM_PENDING_LEN(m) ((m)->pending_len)
 
-#define RM_FAMILIES  0x20
-#define RM_DIALECTS  2
 
 extern THIS void *sy_mutexCtor(void *m, int32_t recursive)
     MANGLED("??0Mutex@@QAE@H@Z");
