@@ -44,7 +44,7 @@
    one nothing ever reads. */
 #define ACTIVE_DICT(h, family, dialect) \
     (*(evv_ref *)((char *)(h) + 0x60c + (family) * 8 + (dialect) * 4))
-#define DICT_FAMILIES   0x12
+#define DICT_FAMILIES   0x20
 #define DICT_DIALECTS   2
 
 #define ENV_LANGUAGE    9

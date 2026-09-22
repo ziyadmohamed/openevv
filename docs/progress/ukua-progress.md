@@ -23,9 +23,9 @@ This document tracks the end-to-end development, architecture decisions, current
 ## Development Roadmap & Status
 
 ### Phase 1: Engine Multi-Language Scalability
-- [ ] Expand `FAMILIES`, `DICT_FAMILIES`, `RM_FAMILIES`, `ROM_FAMILIES` from 18 to 32 in core engine headers and C files.
-- [ ] Register `ukua` in `tools/module/gather.py`.
-- [ ] Verify zero regressions in existing 10 languages.
+- [x] Expand `FAMILIES`, `DICT_FAMILIES`, `RM_FAMILIES`, `ROM_FAMILIES` from 18 to 32 in core engine headers and C files.
+- [x] Register `ukua` in `tools/module/gather.py`.
+- [x] Verify zero regressions in existing 10 languages.
 
 ### Phase 2: Ukrainian Module Chassis Setup
 - [ ] Fork `lang/plpl` chassis to `lang/ukua`.

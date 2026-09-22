@@ -11,7 +11,7 @@
 /* One language and dialect, sixteen records of eighty bytes each and a
    word in front, over eighteen families of two dialects. */
 #define SV_FAMILY_BYTES 0x0a08
-#define FAMILIES        18
+#define FAMILIES        32
 
 /* A mutex, which is all the first-time flag is. */
 #define MUTEX_BYTES 0x0c

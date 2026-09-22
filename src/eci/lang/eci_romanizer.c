@@ -89,7 +89,7 @@ const uint32_t rm_bytes = sizeof(RomanizerManager);
 #define RM_OUT(m)         ((m)->out)
 #define RM_PENDING_LEN(m) ((m)->pending_len)
 
-#define RM_FAMILIES  0x12
+#define RM_FAMILIES  0x20
 #define RM_DIALECTS  2
 
 extern THIS void *sy_mutexCtor(void *m, int32_t recursive)

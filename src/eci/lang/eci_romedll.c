@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include "eci_rom.h"
 
-#define ROM_FAMILIES 0x12
+#define ROM_FAMILIES 0x20
 #define ROM_DIALECTS 2
 
 /* What is linked in. IBM's manager finds its romanizer by taking the address
