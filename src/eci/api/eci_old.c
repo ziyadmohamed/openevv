@@ -102,9 +102,10 @@ static int eo_reentered(OldInst *h, uint32_t bit)
     return 1;
 }
 
-/* How big an instance is, and how big the voice table it carries. */
+/* How big an instance is, and how big the voice table it carries.
+   With FAMILIES expanded to 32, CV_TABLE_BYTES is 32 * 0x1e18 = 0x3c300. */
 #define INSTANCE_BYTES  sizeof(OldInst)
-#define CONCAT_VOICES_BYTES 0x21db0
+#define CONCAT_VOICES_BYTES 0x3c300
 
 /* The environment, and the copy kept beside it so a change can be undone. */
 

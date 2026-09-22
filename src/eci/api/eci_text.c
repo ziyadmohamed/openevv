@@ -220,7 +220,7 @@ void et_processAnnotations(void *concat, int32_t *voice, int32_t *env,
             n = lg_splitLanguageString(text + r, &family, &dialect, &extra);
             if (n <= 0)
                 continue;
-            if (family < 1 || family > 0x12)
+            if (family < 1 || family > 0x20)
                 break;
             if (dialect + 1 > 2)
                 break;

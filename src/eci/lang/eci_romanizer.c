@@ -54,7 +54,7 @@ typedef struct RomanizerManager {
     IniFileReader ini;          /* +0x00c */
     /* Language families of two dialects each: one array of the names
        the romanizers were loaded from, one of the romanizers themselves. */
-    char         *names[RM_FAMILIES + 1][RM_DIALECTS];
+    char         *names[RM_FAMILIES][RM_DIALECTS];
     /* Where IBM keeps the address of getRomObject, which it fetches every
        time it is about to ask for a romanizer. Ours keeps the maker that
        answered for the family being asked about, which is the same thing

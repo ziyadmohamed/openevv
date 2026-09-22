@@ -44,6 +44,12 @@
    one nothing ever reads. */
 #define ACTIVE_DICT(h, family, dialect) \
     (*(evv_ref *)((char *)(h) + 0x60c + (family) * 8 + (dialect) * 4))
+/* In OldInst (src/eci/api/eci_old.h), unknown_614 spans 0x614 to 0x6a4
+   (144 bytes = 18 families * 8 bytes). Ukrainian is family 18 (0x12), which
+   occupies 0x60c + 18*8 + 4 = 0x6a0..0x6a3, fitting within unknown_614.
+   DICT_FAMILIES is 19 with ed_deactivate_all_dicts checking `family < DICT_FAMILIES`,
+   safely covering families 1..18 without exceeding the 0x6a4 boundary (OI_READY).
+   Supporting languages beyond family 18 in the future will require expanding OldInst. */
 #define DICT_FAMILIES   19
 #define DICT_DIALECTS   2
 
