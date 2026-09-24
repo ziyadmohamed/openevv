@@ -17,6 +17,7 @@ reads and writes them by name.
     tools/module/alphabet.py show <tag>              every character and what it is
     tools/module/alphabet.py show <tag> <char>...    only the ones named
     tools/module/alphabet.py add <tag> <byte> <field>=<value>...
+    tools/module/alphabet.py set <tag> <byte> <field>=<value>...
 
 `add' puts a character at a byte value nothing in the alphabet claims yet, so
 that no existing code changes meaning: the dictionaries are keyed by these
@@ -24,6 +25,17 @@ codes and moving one would move every word that used it. The byte is what the
 engine will see for that character once it arrives, in hex.
 
     tools/module/alphabet.py add plpl b1 case=lower type=letter letter=vow \\
+                              accent='~yes' phoneme=a
+
+`set' rewrites the record of a byte the alphabet already claims, leaving its
+name and every other byte's code exactly where it is -- no line moves, so
+nothing that keyed on a code shifts under it. It is how a slot that used to
+mean one letter comes to mean another: a language built on a chassis whose
+alphabet it does not want reuses those slots for its own letters rather than
+renumbering the lot. Whatever code points arrive as that byte are then its
+new letter's, which is `<tag>.codepoints' work.
+
+    tools/module/alphabet.py set ukua c0 case=lower type=letter letter=vow \\
                               accent='~yes' phoneme=a
 
 usage: as above; `show' with no character lists the lot
@@ -128,18 +140,7 @@ def show(tag, want):
 
 def add(tag, byte, args):
     lines, first, last, names, values, variants, var_at = read(tag)
-    want = {}
-    for a in args:
-        if "=" not in a:
-            raise SystemExit("module/alphabet: %r is not field=value" % a)
-        k, v = a.split("=", 1)
-        if k not in RECORD:
-            raise SystemExit("module/alphabet: a record has no %r; it has %s"
-                             % (k, ", ".join(RECORD)))
-        want[k] = v
-    for k in RECORD:
-        if k not in want:
-            raise SystemExit("module/alphabet: say what its %s is" % k)
+    want = want_of(args)
 
     ch = bytes([int(byte, 16)]).decode("latin-1")
     if ch in names:
@@ -174,6 +175,55 @@ def add(tag, byte, args):
     return True
 
 
+def want_of(args):
+    """The five field values a record needs, from field=value arguments."""
+    want = {}
+    for a in args:
+        if "=" not in a:
+            raise SystemExit("module/alphabet: %r is not field=value" % a)
+        k, v = a.split("=", 1)
+        if k not in RECORD:
+            raise SystemExit("module/alphabet: a record has no %r; it has %s"
+                             % (k, ", ".join(RECORD)))
+        want[k] = v
+    for k in RECORD:
+        if k not in want:
+            raise SystemExit("module/alphabet: say what its %s is" % k)
+    return want
+
+
+def set_(tag, byte, args):
+    lines, first, last, names, values, variants, var_at = read(tag)
+    want = want_of(args)
+
+    ch = bytes([int(byte, 16)]).decode("latin-1")
+    if ch not in names:
+        raise SystemExit("module/alphabet: %s has no character at byte %s to"
+                         " set; `add' puts one there" % (tag, byte))
+    code = names.index(ch)
+    if (code + 1) * 5 > len(variants):
+        raise SystemExit("module/alphabet: %s has %d bytes of records, too few"
+                         " for code %d" % (tag, len(variants), code))
+
+    # A record straddles the variants lines -- they hold many bytes each, not
+    # one record apiece -- so splice the five bytes into the flat array and
+    # lay it back out over the very same lines, each keeping its own length.
+    record = bytes(number(values, k, want[k]) for k in RECORD)
+    flat = bytearray(variants)
+    flat[code * 5:code * 5 + 5] = record
+    at = 0
+    for i in var_at:
+        n = len(lines[i].split()) - 1
+        lines[i] = "  variants %s" % " ".join("%02x" % b for b in flat[at:at + n])
+        at += n
+
+    open(path_of(tag), "w").write("\n".join(lines))
+    print("%s: code %d (byte %s) is %s now"
+          % (tag, code, byte,
+             ", ".join("%s %s" % (k, want[k]) for k in RECORD)))
+    return True
+
+
 def main(argv):
     if len(argv) < 2:
         print(__doc__.strip())
@@ -183,6 +233,8 @@ def main(argv):
         return 0 if show(tag, set(argv[2:])) else 1
     if what == "add" and len(argv) > 2:
         return 0 if add(tag, argv[2], argv[3:]) else 1
+    if what == "set" and len(argv) > 2:
+        return 0 if set_(tag, argv[2], argv[3:]) else 1
     print(__doc__.strip())
     return 2
 
