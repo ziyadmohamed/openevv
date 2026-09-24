@@ -397,35 +397,135 @@ end
 # same letter.
 rule pol_test_own_letters takes 1 from it_phone.obj
   bare
-  call test_string_s 1 1 sym pol_letter_aogonek
+  # Every Cyrillic letter is one of ours: none has a Latin arm to catch it, so
+  # the chain always arrives here. Thirty-two of the thirty-three say a sound;
+  # the soft sign ь carries none, and is left to fall through and be dropped,
+  # which is what a segment-less letter should do until palatalisation is wired.
+  call test_string_s 1 1 sym ukua_let_a
   if answer is 0
     answer 0
   end
-  call test_string_s 1 1 sym pol_letter_cacute
+  call test_string_s 1 1 sym ukua_let_b
   if answer is 0
     answer 0
   end
-  call test_string_s 1 1 sym pol_letter_eogonek
+  call test_string_s 1 1 sym ukua_let_v
   if answer is 0
     answer 0
   end
-  call test_string_s 1 1 sym pol_letter_lstroke
+  call test_string_s 1 1 sym ukua_let_h
   if answer is 0
     answer 0
   end
-  call test_string_s 1 1 sym pol_letter_nacute
+  call test_string_s 1 1 sym ukua_let_g
   if answer is 0
     answer 0
   end
-  call test_string_s 1 1 sym pol_letter_sacute
+  call test_string_s 1 1 sym ukua_let_d
   if answer is 0
     answer 0
   end
-  call test_string_s 1 1 sym pol_letter_zacute
+  call test_string_s 1 1 sym ukua_let_e
   if answer is 0
     answer 0
   end
-  call test_string_s 1 1 sym pol_letter_zdot
+  call test_string_s 1 1 sym ukua_let_je
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_zh
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_z
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_y
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_i
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_ji
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_j
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_k
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_l
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_m
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_n
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_o
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_p
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_r
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_s
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_t
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_u
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_f
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_kh
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_ts
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_ch
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_sh
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_shch
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_ju
+  if answer is 0
+    answer 0
+  end
+  call test_string_s 1 1 sym ukua_let_ja
   if answer is 0
     answer 0
   end
@@ -451,90 +551,297 @@ rule apply_pol_letter_rules takes 3 from it_phone.obj
     give up
   end
 
-  call test_string_s 1 1 sym pol_letter_aogonek
+  # Each arm sets the scan at the letter, asks whether it is this one, and lays
+  # its phoneme between the two pointers. The first uses the scan the header
+  # left; every one after it sets its own, the way the Polish version did. Five
+  # letters -- є ї ю я and щ -- are two phones, so they insert a string of two.
+  call test_string_s 1 1 sym ukua_let_a
   if answer is 0
-    # a with an ogonek is a nasal vowel of its own, on a code of its own: the
-    # open o's rule speaks it, and pol_nasal_if_aogonek in is_sival.up is what
-    # makes that one nasal and the plain o not.
     call lpta_rpta_loadp addr left addr right
-    call insert_2pt_s 2 1 sym pol_ph_aogonek 0
+    call insert_2pt_s 2 1 sym ukua_ph_a 0
     if answer is 0
       go to said
     end
   end
   call ZZlpta_load__setscan_r__1 addr left
-  call test_string_s 1 1 sym pol_letter_eogonek
+  call test_string_s 1 1 sym ukua_let_b
   if answer is 0
-    # e with an ogonek is a nasal vowel of its own now, on the close-mid o's
-    # code, which nothing else produces. What made it possible is that
-    # nasalize_vow writes one global to nasalise a vowel next to a nasal
-    # consonant, and stanital_ph_o writes the same one without needing the
-    # consonant.
-    call ZZlprp_load__insert_2pt_s_2_1_ZZstring153 addr left addr right
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_b 0
     if answer is 0
       go to said
     end
   end
   call ZZlpta_load__setscan_r__1 addr left
-  call test_string_s 1 1 sym pol_letter_lstroke
+  call test_string_s 1 1 sym ukua_let_v
   if answer is 0
-    call ZZlprp_load__insert_2pt_s_2_1_ZZstring132 addr left addr right  # the glide
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_v 0
     if answer is 0
       go to said
     end
   end
   call ZZlpta_load__setscan_r__1 addr left
-  call test_string_s 1 1 sym pol_letter_nacute
+  call test_string_s 1 1 sym ukua_let_h
   if answer is 0
-    call ZZlprp_load__insert_2pt_s_2_1_ZZstring79 addr left addr right  # the palatal nasal
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_h 0
     if answer is 0
       go to said
     end
   end
   call ZZlpta_load__setscan_r__1 addr left
-  call test_string_s 1 1 sym pol_letter_sacute
+  call test_string_s 1 1 sym ukua_let_g
   if answer is 0
-    call ZZlprp_load__insert_2pt_s_2_1_ZZstring25 addr left addr right  # the soft ś
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_g 0
     if answer is 0
       go to said
     end
   end
   call ZZlpta_load__setscan_r__1 addr left
-  call test_string_s 1 1 sym pol_letter_cacute
+  call test_string_s 1 1 sym ukua_let_d
   if answer is 0
-    call ZZlprp_load__insert_2pt_s_2_1_ZZstring53 addr left addr right  # the soft ć
-    if answer is 0
-      go to said
-    end
-  end
-  # z with an acute is the soft one, Italian's own Z, and z with a dot is the
-  # hard one, which is a phoneme of Polish's own.
-  call ZZlpta_load__setscan_r__1 addr left
-  call test_string_s 1 1 sym pol_letter_zacute
-  if answer is 0
-    call pol_devoices_here addr right
-    if answer is 0
-      call ZZlprp_load__insert_2pt_s_2_1_ZZstring25 addr left addr right  # ś, devoiced
-      if answer is 0
-        go to said
-      end
-    end
-    call ZZlprp_load__insert_2pt_s_2_1_ZZstring18 addr left addr right  # the soft ź
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_d 0
     if answer is 0
       go to said
     end
   end
   call ZZlpta_load__setscan_r__1 addr left
-  call test_string_s 1 1 sym pol_letter_zdot
+  call test_string_s 1 1 sym ukua_let_e
   if answer is 0
-    call pol_devoices_here addr right
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_e 0
     if answer is 0
-      call ZZlprp_load__insert_2pt_s_2_1_ZZstring113 addr left addr right  # sz, devoiced
-      if answer is 0
-        go to said
-      end
+      go to said
     end
-    call ZZlprp_load__insert_2pt_s_2_1_ZZstring103 addr left addr right  # the hard ż
+  end
+  # є is iotated: the glide and then the open e, two phones in one letter.
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_je
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 2 sym ukua_ph_je 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_zh
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_zh 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_z
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_z 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_y
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_y 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_i
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_i 0
+    if answer is 0
+      go to said
+    end
+  end
+  # ї is iotated i: the glide and then i.
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_ji
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 2 sym ukua_ph_ji 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_j
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_j 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_k
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_k 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_l
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_l 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_m
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_m 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_n
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_n 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_o
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_o 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_p
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_p 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_r
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_r 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_s
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_s 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_t
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_t 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_u
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_u 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_f
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_f 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_kh
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_kh 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_ts
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_ts 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_ch
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_ch 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_sh
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 1 sym ukua_ph_sh 0
+    if answer is 0
+      go to said
+    end
+  end
+  # щ is /ʃtʃ/: the fricative and then the affricate, two phones.
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_shch
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 2 sym ukua_ph_shch 0
+    if answer is 0
+      go to said
+    end
+  end
+  # ю and я are iotated: the glide and then u, and the glide and then a.
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_ju
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 2 sym ukua_ph_ju 0
+    if answer is 0
+      go to said
+    end
+  end
+  call ZZlpta_load__setscan_r__1 addr left
+  call test_string_s 1 1 sym ukua_let_ja
+  if answer is 0
+    call lpta_rpta_loadp addr left addr right
+    call insert_2pt_s 2 2 sym ukua_ph_ja 0
     if answer is 0
       go to said
     end

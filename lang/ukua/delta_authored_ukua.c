@@ -193,6 +193,134 @@ uint8_t ukua_evv_authored_data[] = {
     16,
     /* pol_ph_x, 1 bytes at 416 */
     36,
+    /* ukua_let_a, 1 bytes at 417 */
+    102,
+    /* ukua_let_b, 1 bytes at 418 */
+    112,
+    /* ukua_let_v, 1 bytes at 419 */
+    122,
+    /* ukua_let_h, 1 bytes at 420 */
+    129,
+    /* ukua_let_g, 1 bytes at 421 */
+    136,
+    /* ukua_let_d, 1 bytes at 422 */
+    142,
+    /* ukua_let_e, 1 bytes at 423 */
+    144,
+    /* ukua_let_je, 1 bytes at 424 */
+    152,
+    /* ukua_let_zh, 1 bytes at 425 */
+    103,
+    /* ukua_let_z, 1 bytes at 426 */
+    113,
+    /* ukua_let_y, 1 bytes at 427 */
+    123,
+    /* ukua_let_i, 1 bytes at 428 */
+    137,
+    /* ukua_let_ji, 1 bytes at 429 */
+    104,
+    /* ukua_let_j, 1 bytes at 430 */
+    114,
+    /* ukua_let_k, 1 bytes at 431 */
+    124,
+    /* ukua_let_l, 1 bytes at 432 */
+    138,
+    /* ukua_let_m, 1 bytes at 433 */
+    154,
+    /* ukua_let_n, 1 bytes at 434 */
+    156,
+    /* ukua_let_o, 1 bytes at 435 */
+    105,
+    /* ukua_let_p, 1 bytes at 436 */
+    115,
+    /* ukua_let_r, 1 bytes at 437 */
+    125,
+    /* ukua_let_s, 1 bytes at 438 */
+    130,
+    /* ukua_let_t, 1 bytes at 439 */
+    139,
+    /* ukua_let_u, 1 bytes at 440 */
+    148,
+    /* ukua_let_f, 1 bytes at 441 */
+    106,
+    /* ukua_let_kh, 1 bytes at 442 */
+    116,
+    /* ukua_let_ts, 1 bytes at 443 */
+    126,
+    /* ukua_let_ch, 1 bytes at 444 */
+    140,
+    /* ukua_let_sh, 1 bytes at 445 */
+    150,
+    /* ukua_let_shch, 1 bytes at 446 */
+    161,
+    /* ukua_let_ju, 1 bytes at 447 */
+    97,
+    /* ukua_let_ja, 1 bytes at 448 */
+    107,
+    /* ukua_ph_a, 1 bytes at 449 */
+    30,
+    /* ukua_ph_b, 1 bytes at 450 */
+    1,
+    /* ukua_ph_v, 1 bytes at 451 */
+    7,
+    /* ukua_ph_h, 1 bytes at 452 */
+    36,
+    /* ukua_ph_g, 1 bytes at 453 */
+    6,
+    /* ukua_ph_d, 1 bytes at 454 */
+    3,
+    /* ukua_ph_e, 1 bytes at 455 */
+    29,
+    /* ukua_ph_je, 2 bytes at 456 */
+    25,29,
+    /* ukua_ph_zh, 1 bytes at 458 */
+    11,
+    /* ukua_ph_z, 1 bytes at 459 */
+    9,
+    /* ukua_ph_y, 1 bytes at 460 */
+    27,
+    /* ukua_ph_i, 1 bytes at 461 */
+    27,
+    /* ukua_ph_ji, 2 bytes at 462 */
+    25,27,
+    /* ukua_ph_j, 1 bytes at 464 */
+    25,
+    /* ukua_ph_k, 1 bytes at 465 */
+    5,
+    /* ukua_ph_l, 1 bytes at 466 */
+    23,
+    /* ukua_ph_m, 1 bytes at 467 */
+    17,
+    /* ukua_ph_n, 1 bytes at 468 */
+    18,
+    /* ukua_ph_o, 1 bytes at 469 */
+    32,
+    /* ukua_ph_p, 1 bytes at 470 */
+    2,
+    /* ukua_ph_r, 1 bytes at 471 */
+    21,
+    /* ukua_ph_s, 1 bytes at 472 */
+    10,
+    /* ukua_ph_t, 1 bytes at 473 */
+    4,
+    /* ukua_ph_u, 1 bytes at 474 */
+    31,
+    /* ukua_ph_f, 1 bytes at 475 */
+    8,
+    /* ukua_ph_kh, 1 bytes at 476 */
+    36,
+    /* ukua_ph_ts, 1 bytes at 477 */
+    16,
+    /* ukua_ph_ch, 1 bytes at 478 */
+    14,
+    /* ukua_ph_sh, 1 bytes at 479 */
+    12,
+    /* ukua_ph_shch, 2 bytes at 480 */
+    12,14,
+    /* ukua_ph_ju, 2 bytes at 482 */
+    25,31,
+    /* ukua_ph_ja, 2 bytes at 484 */
+    25,30,
 };
 
 const delta_store ukua_delta_authored_store[] = {

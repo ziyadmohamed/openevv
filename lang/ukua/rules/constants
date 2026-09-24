@@ -147,3 +147,84 @@ bytes pol_letter_h        10
 
 # The phone ch and h lay down: /x/, code 36.
 bytes pol_ph_x            24
+
+# --- Ukrainian ---------------------------------------------------------------
+# The thirty-three Cyrillic letters. Italian's letter-to-sound chain tests each
+# letter against a Latin code and calls that letter's rule; no Cyrillic letter
+# matches any of those, so every one falls through to the link Polish repointed
+# at pol_test_own_letters and apply_pol_letter_rules, which is where ukua speaks
+# them. The code each letter carries is the input alphabet's -- the index
+# tools/module/alphabet.py show ukua gives it, not the byte the codepoints table
+# maps to -- because that index is what the machine hands the rules and what
+# test_string_s compares. Each Cyrillic byte 0xC0-0xE1 lands on an accented-Latin
+# slot whose Latin-1 name sits at a scattered index, so these are not contiguous.
+bytes ukua_let_a          66      # а  (byte c0, slot À)
+bytes ukua_let_b          70      # б  (c1, Á)
+bytes ukua_let_v          7a      # в  (c2, Â)
+bytes ukua_let_h          81      # г  (c3, Ã)  /ɦ/
+bytes ukua_let_g          88      # ґ  (c4, Ä)
+bytes ukua_let_d          8e      # д  (c5, Å)
+bytes ukua_let_e          90      # е  (c6, Æ)  /ɛ/
+bytes ukua_let_je         98      # є  (c7, Ç)  /jɛ/
+bytes ukua_let_zh         67      # ж  (c8, È)  /ʒ/
+bytes ukua_let_z          71      # з  (c9, É)
+bytes ukua_let_y          7b      # и  (ca, Ê)  /ɪ/
+bytes ukua_let_i          89      # і  (cb, Ë)
+bytes ukua_let_ji         68      # ї  (cc, Ì)  /ji/
+bytes ukua_let_j          72      # й  (cd, Í)  /j/
+bytes ukua_let_k          7c      # к  (ce, Î)
+bytes ukua_let_l          8a      # л  (cf, Ï)
+bytes ukua_let_m          9a      # м  (d0, Ð)
+bytes ukua_let_n          9c      # н  (d1, Ñ)
+bytes ukua_let_o          69      # о  (d2, Ò)
+bytes ukua_let_p          73      # п  (d3, Ó)
+bytes ukua_let_r          7d      # р  (d4, Ô)
+bytes ukua_let_s          82      # с  (d5, Õ)
+bytes ukua_let_t          8b      # т  (d6, Ö)
+bytes ukua_let_u          94      # у  (d8, Ø)
+bytes ukua_let_f          6a      # ф  (d9, Ù)
+bytes ukua_let_kh         74      # х  (da, Ú)  /x/
+bytes ukua_let_ts         7e      # ц  (db, Û)  /ts/
+bytes ukua_let_ch         8c      # ч  (dc, Ü)  /tʃ/
+bytes ukua_let_sh         96      # ш  (dd, Ý)  /ʃ/
+bytes ukua_let_shch       a1      # щ  (de, Þ)  /ʃtʃ/
+bytes ukua_let_ju         61      # ю  (e0, à)  /ju/
+bytes ukua_let_ja         6b      # я  (e1, á)  /ja/
+# What each letter says, in the phone statement's own codes (phonemes.py
+# prints them). These are all Italian's own phonemes -- ukua adds no phoneme of
+# its own, so every one already has its rule and its formant loci. Where
+# Ukrainian has a sound Italian has not, the nearest is used and marked for the
+# formant pass: г /ɦ/ and х /x/ both take /x/, и /ɪ/ takes /i/, о /ɔ/ takes /o/,
+# ч /tʃ/ takes the soft affricate C. The iotated vowels and щ are two phones.
+bytes ukua_ph_a           1e      # a
+bytes ukua_ph_b           01      # b
+bytes ukua_ph_v           07      # v
+bytes ukua_ph_h           24      # г -> /x/, refine to /ɦ/ in the formant pass
+bytes ukua_ph_g           06      # g
+bytes ukua_ph_d           03      # d
+bytes ukua_ph_e           1d      # E  /ɛ/
+bytes ukua_ph_je          19 1d   # j + E   (є)
+bytes ukua_ph_zh          0b      # Z  /ʒ/
+bytes ukua_ph_z           09      # z
+bytes ukua_ph_y           1b      # и -> /i/, refine to /ɪ/
+bytes ukua_ph_i           1b      # i
+bytes ukua_ph_ji          19 1b   # j + i   (ї)
+bytes ukua_ph_j           19      # y glide  /j/
+bytes ukua_ph_k           05      # k
+bytes ukua_ph_l           17      # l
+bytes ukua_ph_m           11      # m
+bytes ukua_ph_n           12      # n
+bytes ukua_ph_o           20      # о -> /o/, refine to /ɔ/
+bytes ukua_ph_p           02      # p
+bytes ukua_ph_r           15      # r
+bytes ukua_ph_s           0a      # s
+bytes ukua_ph_t           04      # t
+bytes ukua_ph_u           1f      # u
+bytes ukua_ph_f           08      # f
+bytes ukua_ph_kh          24      # x  /x/
+bytes ukua_ph_ts          10      # T  /ts/
+bytes ukua_ph_ch          0e      # C  /tʃ/ approximated by the soft affricate
+bytes ukua_ph_sh          0c      # S  /ʃ/
+bytes ukua_ph_shch        0c 0e   # S + C   (щ /ʃtʃ/)
+bytes ukua_ph_ju          19 1f   # j + u   (ю)
+bytes ukua_ph_ja          19 1e   # j + a   (я)
