@@ -289,6 +289,33 @@ jobs:
             test -s "/tmp/one-$id.wav"
           done
 
+  # Ukrainian said aloud, so the module can be heard rather than only shown to
+  # link. Dispatch-only: it is not a gate, it exists to hand back a wav. The
+  # sound is still the Italian chassis' phonemes on Cyrillic input until the
+  # phoneme and rule work lands, so this is a plumbing demo, not a voice yet.
+  ukua-audio:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build probe-ukua and speak Ukrainian
+        run: |
+          set -eu
+          make -j"$(nproc)" probe LANG=lang/ukua RULES=bytecode
+          mkdir -p ukua-audio
+          build/probe-ukua "Привіт. Добрий день. Слава Україні. П'ять. М'ясо." \
+            ukua-audio/ukua-phrases.wav
+          build/probe-ukua "Привіт" ukua-audio/pryvit.wav
+          build/probe-ukua "Слава Україні" ukua-audio/slava-ukraini.wav
+          test -s ukua-audio/ukua-phrases.wav
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ukua-audio
+          path: ukua-audio/
+          if-no-files-found: error
+
   # Cross-compiled here rather than on a Windows runner, because this is the
   # same toolchain the tree is developed with and it takes a minute.
   windows:
