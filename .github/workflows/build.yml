@@ -290,9 +290,10 @@ jobs:
           done
 
   # Ukrainian said aloud, so the module can be heard rather than only shown to
-  # link. Dispatch-only: it is not a gate, it exists to hand back a wav. The
-  # sound is still the Italian chassis' phonemes on Cyrillic input until the
-  # phoneme and rule work lands, so this is a plumbing demo, not a voice yet.
+  # link. Dispatch-only: it is not a gate, it exists to hand back a wav and to
+  # say, in the log, what the engine did with Cyrillic -- the bytes it was
+  # handed, the phonemes it placed, and how many samples came out. The sound is
+  # still the Italian chassis' phonemes until the phoneme and rule work lands.
   ukua-audio:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -304,11 +305,32 @@ jobs:
           set -eu
           make -j"$(nproc)" probe LANG=lang/ukua RULES=bytecode
           mkdir -p ukua-audio
-          build/probe-ukua "Привіт. Добрий день. Слава Україні. П'ять. М'ясо." \
-            ukua-audio/ukua-phrases.wav
-          build/probe-ukua "Привіт" ukua-audio/pryvit.wav
-          build/probe-ukua "Слава Україні" ukua-audio/slava-ukraini.wav
-          test -s ukua-audio/ukua-phrases.wav
+
+          # The bytes must reach probe intact. On a native Linux run argv is
+          # already the UTF-8 the file holds, but the @file path is what the
+          # tree uses everywhere (test/matrix.sh) and is byte-identical under
+          # Wine too, so write the text to files and speak those.
+          printf '%s' "Привіт. Добрий день. Слава Україні. П'ять. М'ясо." > phrases.txt
+          printf '%s' "Привіт" > pryvit.txt
+          printf '%s' "Слава Україні" > slava.txt
+
+          echo "=== bytes probe is handed (phrases.txt) ==="
+          od -An -tx1 phrases.txt
+
+          # `p' asks the engine to report the phonemes it placed, so the log
+          # says whether the Cyrillic mapped to sounds at all -- the difference
+          # between an encoding failure and a rules one.
+          echo "=== phonemes for Привіт (via @file) ==="
+          build/probe-ukua @pryvit.txt ukua-audio/pryvit.wav p || true
+          echo "=== phonemes for Привіт (via direct argv, for contrast) ==="
+          build/probe-ukua "Привіт" /tmp/pryvit-argv.wav p || true
+
+          echo "=== speak the phrases and Слава Україні to wav ==="
+          build/probe-ukua @phrases.txt ukua-audio/ukua-phrases.wav
+          build/probe-ukua @slava.txt ukua-audio/slava-ukraini.wav
+
+          echo "=== resulting wav sizes ==="
+          ls -l ukua-audio/
 
       - uses: actions/upload-artifact@v7
         with:
