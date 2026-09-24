@@ -1,0 +1,87 @@
+# What each Ukrainian character arrives as: the Unicode code point a caller
+# writes, then the byte ukua's alphabet knows it by. tools/module/codepoints.py
+# turns this into delta_codepoints_ukua.c, and refuses any byte the alphabet
+# (ukua.statements, edited through tools/module/alphabet.py) does not name.
+#
+# The 33 Cyrillic letters sit on latin-1 byte slots that Italian filled with
+# accented Latin -- the chassis was Italian and Ukrainian has no use for those
+# -- repurposed record by record with `alphabet.py set'. A capital arrives as
+# its own lower-case byte, so the engine never sees a capital to fold and the
+# convert_to_lowercase path has nothing to get wrong.
+
+# lower-case letters
+0430 c0   # а
+0431 c1   # б
+0432 c2   # в
+0433 c3   # г
+0491 c4   # ґ
+0434 c5   # д
+0435 c6   # е
+0454 c7   # є
+0436 c8   # ж
+0437 c9   # з
+0438 ca   # и
+0456 cb   # і
+0457 cc   # ї
+0439 cd   # й
+043a ce   # к
+043b cf   # л
+043c d0   # м
+043d d1   # н
+043e d2   # о
+043f d3   # п
+0440 d4   # р
+0441 d5   # с
+0442 d6   # т
+0443 d8   # у
+0444 d9   # ф
+0445 da   # х
+0446 db   # ц
+0447 dc   # ч
+0448 dd   # ш
+0449 de   # щ
+044c df   # ь
+044e e0   # ю
+044f e1   # я
+
+# capitals, each onto the byte of its own lower-case letter
+0410 c0   # А
+0411 c1   # Б
+0412 c2   # В
+0413 c3   # Г
+0490 c4   # Ґ
+0414 c5   # Д
+0415 c6   # Е
+0404 c7   # Є
+0416 c8   # Ж
+0417 c9   # З
+0418 ca   # И
+0406 cb   # І
+0407 cc   # Ї
+0419 cd   # Й
+041a ce   # К
+041b cf   # Л
+041c d0   # М
+041d d1   # Н
+041e d2   # О
+041f d3   # П
+0420 d4   # Р
+0421 d5   # С
+0422 d6   # Т
+0423 d8   # У
+0424 d9   # Ф
+0425 da   # Х
+0426 db   # Ц
+0427 dc   # Ч
+0428 dd   # Ш
+0429 de   # Щ
+042c df   # Ь
+042e e0   # Ю
+042f e1   # Я
+
+# the combining acute the stress dictionary writes after a stressed vowel,
+# and the two apostrophes that stand in for the hard sign before iotated
+# vowels -- both folded onto the plain apostrophe the alphabet already names
+0301 e2   # combining acute accent (stress mark)
+2019 27   # right single quotation mark -> apostrophe
+02bc 27   # modifier letter apostrophe -> apostrophe

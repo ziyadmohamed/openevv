@@ -34,9 +34,15 @@ This document tracks the end-to-end development, architecture decisions, current
 - [ ] Update `ukua.globals` and statement references.
 
 ### Phase 3: Cyrillic Alphabet & UTF-8 Codepoints
-- [ ] Define Ukrainian Cyrillic alphabet (33 lowercase, 33 uppercase, apostrophe, hyphen) in `ukua.statements`.
-- [ ] Create `lang/ukua/ukua.codepoints` mapping Unicode Cyrillic (U+0400..U+04FF) to Delta byte codes (0x80..0xDF).
-- [ ] Compile `delta_codepoints_ukua.c` and verify UTF-8 input recoding in `addTextRun`.
+- [x] Define the 33 Ukrainian Cyrillic letters in `ukua.statements`. The chassis was Italian and its 33 accented-Latin lower-case slots were unused, so each was repurposed in place with `tools/module/alphabet.py set` (byte and name unchanged, only the 5-byte record rewritten) — no code keyed on a byte shifts. Bytes `0xC0`–`0xE1` (skipping `0xD7` `×`) carry the letters in alphabet order; `0xE2` carries the combining stress mark, typed `acute_acc`.
+- [x] Create `lang/ukua/ukua.codepoints` mapping Unicode Cyrillic to those bytes: 33 lower-case letters, 33 capitals each folded onto its own lower-case byte (so the engine never sees a capital to fold), the combining acute `U+0301`→`0xE2`, and the two Unicode apostrophes `U+2019`/`U+02BC`→`0x27`.
+- [x] Compile `delta_codepoints_ukua.c` (69 entries) via `tools/module/codepoints.py ukua`. UTF-8 input recoding in `addTextRun` is exercised in CI.
+- [x] Fix the stale `delta_consts_plpl.c` reference in `lang/ukua/rules/symbols`.
+
+> Note: the plan's Task 3 proposed bytes `0x80`–`0xDF`, but the low half of
+> that range is claimed by Italian letters the chassis still carries. The
+> reclaim above (accented-Latin slots, records only) realises the same intent
+> without renumbering any existing code point.
 
 ### Phase 4: RHVoice Phonemes & Formant Locus Rules
 - [ ] Map RHVoice phoneme inventory (6 monophthongs, iotated vowels, hard/soft consonants, affricates) into `ukua.statements` and `ukua.settings`.
