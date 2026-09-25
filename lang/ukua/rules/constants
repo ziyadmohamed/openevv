@@ -198,7 +198,7 @@ bytes ukua_let_shch       a1      # щ  (de, Þ)  /ʃtʃ/
 # letters Italian folds to their bare nucleus: я on æ (e6) -> /a/, ю on ù (f9) ->
 # /u/. The right vowel, no j onset yet. These two codes are what the own-arm
 # would test for and are dormant while the parking stands; Phase 5 retires them.
-bytes ukua_let_ju         93      # ю  (dormant; parked on ù/f9 -> /u/ for now)
+bytes ukua_let_ju         65      # ю  (parked on ù/f9; index 101=0x65, keyed to reach the own-arm)
 bytes ukua_let_ja         8f      # я  (dormant; parked on æ/e6 -> /a/ for now)
 # What each letter says, in the phone statement's own codes (phonemes.py
 # prints them). These are all Italian's own phonemes -- ukua adds no phoneme of
