@@ -339,6 +339,22 @@ jobs:
           echo "=== control: single Latin letter p (phonemes) ==="
           build/probe-ukua "p" /tmp/latin-p.wav p || true
 
+          # Decisive partition: feed the exact WESTERN bytes that Привіт should
+          # transcode to (0xd3 0xd4 0xca 0xc2 0xcb 0xd6 = codes 115 125 123 122
+          # 137 139 = п р и в і т) straight in. These are not valid UTF-8, so
+          # utf8ToWestern leaves them untouched and the engine sees the codes
+          # directly, bypassing transcoding. If THIS makes phonemes (p r y v i
+          # t), the byte->phoneme path works and the Cyrillic loss is in
+          # transcoding; if it too is silent, those codes never reach the
+          # letter-to-sound and transcoding is not the culprit.
+          printf '\xd3\xd4\xca\xc2\xcb\xd6' > rawcodes.txt
+          echo "=== control: raw western bytes for пр и в і т (phonemes) ==="
+          od -An -tx1 rawcodes.txt
+          build/probe-ukua @rawcodes.txt /tmp/rawcodes.wav p || true
+          printf '\xd3' > rawp.txt
+          echo "=== control: single raw byte 0xd3 (code 115, п, phonemes) ==="
+          build/probe-ukua @rawp.txt /tmp/rawp.wav p || true
+
           echo "=== resulting wav sizes ==="
           ls -l ukua-audio/
 
