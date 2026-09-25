@@ -83,14 +83,19 @@ only takes effect once the G2P layer reads it.
 > /dʒ/), `дзвін`→`[.1dzvin]` (`дз`→d+z) — so no digraph rule is required. The
 > affricates and hushing consonants map cleanly: `ц`→T /ts/, `ч`→C (soft,
 > adequate), `ш`→S, `ж`→Z, `щ`→S+C /ʃtʃ/. `г` and `х` both take /x/ ("A"), the
-> best phone the inventory offers. The one correct refinement reachable with an
-> existing phone is **`о` /ɔ/**: changed from close /o/ (code 0x20) to the
-> open-o (0x21) that Polish's `pol_ph_on` already lays down — it renders "c" in
-> the audit. The remaining refinements (`и` /ɪ/, `г` /ɦ/, a hard `ч`) each need a
-> *new* phoneme added to the synthesis inventory (formant/duration tables plus
-> `ukua.statements`/`ukua.settings`), which is real acoustic work verifiable only
-> by ear in CI, and is held pending that pass. `ь` palatalisation and the `я/ю`
-> glide belong to Phase 5, not here.
+> best phone the inventory offers.
+>
+> The remaining vowel/consonant refinements — `о` /ɔ/ (open-o), `и` /ɪ/, `г` /ɦ/,
+> a hard `ч` — are all **blocked on the same thing: there is no acoustic oracle
+> for Ukrainian.** The phoneme audit is the only signal CI gives, and it is blind
+> to formant nuance. Retargeting `о` from the close /o/ (0x20) to the open-o
+> (0x21) that `pol_ph_on` uses was tried (commit d8fdc6a) and the phoneme line was
+> byte-identical before and after — `гора`→`[.0Ao.1ra]`, `моя`→`[.0mo.1a]` either
+> way — so the audit cannot confirm the change did anything, and it was reverted
+> to keep the checkpoint fully proven. `и` /ɪ/, `г` /ɦ/ and a hard `ч` additionally
+> need a *new* phoneme added to the synthesis inventory. This whole phase waits on
+> a way to verify audio (wav samples / matrix baselines), not on the mappings.
+> `ь` palatalisation and the `я/ю` glide belong to Phase 5, not here.
 
 ### Phase 5: Dictionary Ingestion from `lang-uk` Stress Dictionary
 - [ ] Cloud CI workflow to fetch `lang-uk/ukrainian-word-stress-dictionary`.
