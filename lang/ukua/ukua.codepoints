@@ -41,12 +41,14 @@
 0448 dd   # ш
 0449 de   # щ
 044c df   # ь
-044e 86   # ю  -- byte 86 (Polish's ł slot, code 0xd2): a clean "own letter"
-          #    routed through pol_test_own_letters. NOT à(e0) (Italian's accented
-          #    a, stripped to bare a) and NOT ą(82)/ę(84): those are Polish's
-          #    nasal vowels, handled by the phone default + is_sival, so they
-          #    never reach the own-letter arm chain and the ju/ja rules go unrun.
-044f 87   # я  -- byte 87 (Polish's ń slot, code 0xd3), same reasoning as ю
+044e d7   # ю  -- byte d7 (× slot, code 179). Bytes 86/87 sit inside 0x80-0x9f,
+          #    which rz_convertText turns into spaces, so ю/я were being erased
+          #    before letter-to-sound ran at all. d7 is >=0xa0 (survives the
+          #    filter) and is not an accented Latin letter, so Italian's per-letter
+          #    chain has no arm to catch it and it falls through to
+          #    pol_test_own_letters and the ju rule (the path that already carries
+          #    ї -> j+i correctly from the c0-df region).
+044f a2   # я  -- byte a2 (¢ slot, code 163), same reasoning as ю
 
 # capitals, each onto the byte of its own lower-case letter
 0410 c0   # А
@@ -80,8 +82,8 @@
 0428 dd   # Ш
 0429 de   # Щ
 042c df   # Ь
-042e 86   # Ю  -> ю's byte
-042f 87   # Я  -> я's byte
+042e d7   # Ю  -> ю's byte
+042f a2   # Я  -> я's byte
 
 # the combining acute the stress dictionary writes after a stressed vowel,
 # and the two apostrophes that stand in for the hard sign before iotated

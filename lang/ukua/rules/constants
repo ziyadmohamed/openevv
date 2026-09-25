@@ -188,8 +188,8 @@ bytes ukua_let_ts         7e      # ц  (db, Û)  /ts/
 bytes ukua_let_ch         8c      # ч  (dc, Ü)  /tʃ/
 bytes ukua_let_sh         96      # ш  (dd, Ý)  /ʃ/
 bytes ukua_let_shch       a1      # щ  (de, Þ)  /ʃtʃ/
-bytes ukua_let_ju         d2      # ю  (byte 86, Polish's ł slot)  /ju/
-bytes ukua_let_ja         d3      # я  (byte 87, Polish's ń slot)  /ja/
+bytes ukua_let_ju         b3      # ю  (byte d7, code 179)  /ju/
+bytes ukua_let_ja         a3      # я  (byte a2, code 163)  /ja/
 # What each letter says, in the phone statement's own codes (phonemes.py
 # prints them). These are all Italian's own phonemes -- ukua adds no phoneme of
 # its own, so every one already has its rule and its formant loci. Where
