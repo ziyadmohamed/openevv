@@ -224,7 +224,9 @@ bytes ukua_ph_k           05      # k
 bytes ukua_ph_l           17      # l
 bytes ukua_ph_m           11      # m
 bytes ukua_ph_n           12      # n
-bytes ukua_ph_o           20      # о -> /o/, refine to /ɔ/
+bytes ukua_ph_o           21      # о -> /ɔ/ open-o (code 33, the same open o Polish's
+                                  # pol_ph_on lays down; renders "c" in the audit).
+                                  # Refined from close /o/ (0x20) in the Phase-4 pass.
 bytes ukua_ph_p           02      # p
 bytes ukua_ph_r           15      # r
 bytes ukua_ph_s           0a      # s

@@ -77,6 +77,21 @@ only takes effect once the G2P layer reads it.
 - [ ] Implement formant loci in `lang/ukua/rules/is_val.up` (F1, F2, F3 frequencies, bandwidths, transitions).
 - [ ] Implement G2P rules in `rules/` for digraphs (`дж`, `дз`), soft sign `ь` palatalization, and iotated vowels.
 
+> Status (2026-09-25, after the expanded-audit ground truth): much of the
+> intent is already met by the chassis and needs no new work. The digraphs
+> render correctly by adjacency alone — `джерело`→`[.0dZE.0rE.1lo]` (`дж`→d+Z
+> /dʒ/), `дзвін`→`[.1dzvin]` (`дз`→d+z) — so no digraph rule is required. The
+> affricates and hushing consonants map cleanly: `ц`→T /ts/, `ч`→C (soft,
+> adequate), `ш`→S, `ж`→Z, `щ`→S+C /ʃtʃ/. `г` and `х` both take /x/ ("A"), the
+> best phone the inventory offers. The one correct refinement reachable with an
+> existing phone is **`о` /ɔ/**: changed from close /o/ (code 0x20) to the
+> open-o (0x21) that Polish's `pol_ph_on` already lays down — it renders "c" in
+> the audit. The remaining refinements (`и` /ɪ/, `г` /ɦ/, a hard `ч`) each need a
+> *new* phoneme added to the synthesis inventory (formant/duration tables plus
+> `ukua.statements`/`ukua.settings`), which is real acoustic work verifiable only
+> by ear in CI, and is held pending that pass. `ь` palatalisation and the `я/ю`
+> glide belong to Phase 5, not here.
+
 ### Phase 5: Dictionary Ingestion from `lang-uk` Stress Dictionary
 - [ ] Cloud CI workflow to fetch `lang-uk/ukrainian-word-stress-dictionary`.
 - [ ] Compile base vocabulary into `ukua.dict` and `ukua.sets` using `tools/module/dict.py`.
