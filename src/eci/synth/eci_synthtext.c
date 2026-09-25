@@ -266,13 +266,19 @@ static int utf8ToWestern(const char *text, uint32_t len, char *out,
        vowel together, and the Italian chain ukua still leans on folds the byte
        each is parked on (0xe6, 0xf9) to a bare vowel with no /j/ onset. So they
        are pulled apart here, before any of that runs: я -> й а and ю -> й у,
-       two letters that already speak. This is the G2P layer that sits ahead of
-       letter-to-sound; the soft sign, the apostrophe and the дж/дз digraphs
-       will join it here as they are written. It is gated on ukua alone, so no
-       other language's æ (0xe6) or ù (0xf9) -- Italian's ù above all -- is ever
-       touched. The bytes are the codepoints table's: й 0xcd, а 0xc0, у 0xd8
-       (lang/ukua/delta_codepoints_ukua.c), and the out buffer its callers give
-       is sized for the growth (2*len+1). */
+       two letters that already speak. The soft sign ь (0x86) joins them: it is
+       no segment of its own but softens the consonant before it, and the chain
+       has no palatalised consonants to fold it into, so it is voiced as a /j/
+       glide -- ь -> й -- the nearest thing the chain already speaks and the
+       same move as я. That keeps день (/dɛnʲ/) apart from ден, which dropping
+       the letter -- what the chain did with 0x86 before -- silently merged.
+       This is the G2P layer that sits ahead of letter-to-sound; the apostrophe
+       and the дж/дз digraphs will join it here as they are written. It is
+       gated on ukua alone, so no other language's æ (0xe6) or ù (0xf9) --
+       Italian's ù above all -- and no other's 0x86 is ever touched. The out
+       buffer its callers give is sized for the growth (2*len+1). The bytes are
+       the codepoints table's: й 0xcd, а 0xc0, у 0xd8, ь 0x86
+       (lang/ukua/delta_codepoints_ukua.c). */
     const int ukua = l != 0 && l->tag != 0 && strcmp(l->tag, "ukua") == 0;
 
     for (i = 0; i < len; i++) {
@@ -354,6 +360,8 @@ static int utf8ToWestern(const char *text, uint32_t len, char *out,
         } else if (ukua && (uint8_t)cp == 0xf9) { /* ю / Ю  ->  й у */
             *o++ = (char)0xcd;
             *o++ = (char)0xd8;
+        } else if (ukua && (uint8_t)cp == 0x86) { /* ь / Ь  ->  й (glide) */
+            *o++ = (char)0xcd;
         } else {
             *o++ = (char)cp;
         }
