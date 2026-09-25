@@ -238,3 +238,15 @@ bytes ukua_ph_sh          0c      # S  /ʃ/
 bytes ukua_ph_shch        0c 0e   # S + C   (щ /ʃtʃ/)
 bytes ukua_ph_ju          19 1f   # j + u   (ю)
 bytes ukua_ph_ja          19 1e   # j + a   (я)
+
+# The iotated pair, rewritten in INPUT letters rather than phones. я and ю are
+# /ja/ and /ju/, but no free latin-1 byte reaches the own-arm: Italian's
+# letter-to-sound folds every accented latin-1 vowel to its bare nucleus, and
+# я/ю are parked on æ/ù, so left alone they speak the vowel with no /j/ onset.
+# So normalisation rewrites the single letter into two letters that already
+# speak -- я -> й,а and ю -> й,у -- and the own-arm then voices each as it
+# stands, giving /j/ + vowel. These are ALPHABET INDICES, one per character,
+# the same codes test_string_s compares and insert_2pt_s lays down: й is
+# ukua_let_j (0x72), а is ukua_let_a (0x66), у is ukua_let_u (0x94).
+bytes ukua_exp_ja         72 66   # я -> й, а
+bytes ukua_exp_ju         72 94   # ю -> й, у
