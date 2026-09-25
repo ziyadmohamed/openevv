@@ -43,12 +43,17 @@
 044c 86   # ь  -- silent for now (palatalisation is Phase 5). Byte 86 is a
           #    control slot the is-letter filter drops, so ь vanishes exactly
           #    as it did falling through the own-test unspoken.
-044e f8   # ю  -- byte f8 (ø). A latin-1 letter that survives the is-letter
-          #    filter and reaches generate_ital_diaphons; the alphabet leaves it
-          #    saying GAP, so Italian has no arm for it and it falls through to
-          #    the late pol_test_own_letters -> j+u. code 147.
-044f e6   # я  -- byte e6 (æ). Same story: no Italian arm claims it, so it falls
-          #    through to the own-test like the c0-de block -> j+a. code 143.
+044e f9   # ю  -- PARKED as its bare nucleus /u/, glide deferred to Phase 5.
+          #    я and ю are iotated -- /ja/ /ju/ -- so they need the own-arm's two
+          #    phones, but no free latin-1 byte reaches it: Italian's letter-to-
+          #    sound catches every lower-case latin-1 letter (folds the accented
+          #    vowels to a base, ð->d, þ->drop, ß->ss, æ->a, ø->c), and the only
+          #    bytes it leaves alone -- the upper-case block c0-de -- are the
+          #    thirty non-iotated letters, full. So ю rides ù (f9), which Italian
+          #    folds to /u/, giving the right nucleus without the j; the j onset
+          #    is Phase 5's job, expanding ю->й+у before letter-to-sound.
+044f e6   # я  -- PARKED as its bare nucleus /a/, same story: byte æ (e6), which
+          #    Italian folds to /a/. Phase 5 expands я->й+а for the full /ja/.
 
 # capitals, each onto the byte of its own lower-case letter
 0410 c0   # А
@@ -82,7 +87,7 @@
 0428 dd   # Ш
 0429 de   # Щ
 042c 86   # Ь  -> ь's silent byte
-042e f8   # Ю  -> ю's byte
+042e f9   # Ю  -> ю's byte
 042f e6   # Я  -> я's byte
 
 # the combining acute the stress dictionary writes after a stressed vowel,

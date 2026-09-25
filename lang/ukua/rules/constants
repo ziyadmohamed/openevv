@@ -188,16 +188,18 @@ bytes ukua_let_ts         7e      # ц  (db, Û)  /ts/
 bytes ukua_let_ch         8c      # ч  (dc, Ü)  /tʃ/
 bytes ukua_let_sh         96      # ш  (dd, Ý)  /ʃ/
 bytes ukua_let_shch       a1      # щ  (de, Þ)  /ʃtʃ/
-# я and ю sit on two foreign latin-1 letter bytes -- æ (e6) and ø (f8) -- chosen
-# because the input alphabet leaves both saying GAP: Italian gave them no sound
-# and, unlike the accented vowels it strips to a Latin base or the eth/thorn it
-# catches as dentals, has no letter-to-sound arm that claims them. So each falls
-# through generate_ital_diaphons exactly as the thirty c0-de letters do, reaching
-# the late pol_test_own_letters that speaks every Cyrillic letter by our own arm.
-# The c0-de block was full (thirty letters, no free slot left), which is why these
-# two live out here among the lower-case latin-1 letters instead.
-bytes ukua_let_ju         93      # ю  (byte f8, ø; code 147)  /ju/
-bytes ukua_let_ja         8f      # я  (byte e6, æ; code 143)  /ja/
+# я and ю are iotated -- /ja/ and /ju/ -- so a correct rendering needs the two
+# phones the own-arm lays down (j + vowel). But no free latin-1 byte reaches the
+# own-arm: Italian's letter-to-sound catches every lower-case latin-1 letter
+# (folding the accented vowels to a base, and ð->d, þ->drop, ß->ss, æ->a, ø->c),
+# and the only bytes it leaves untouched -- the upper-case block c0-de -- are the
+# thirty non-iotated letters, full. So until the Phase-5 G2P layer expands
+# я->й+а and ю->й+у before letter-to-sound, the two are PARKED on the latin-1
+# letters Italian folds to their bare nucleus: я on æ (e6) -> /a/, ю on ù (f9) ->
+# /u/. The right vowel, no j onset yet. These two codes are what the own-arm
+# would test for and are dormant while the parking stands; Phase 5 retires them.
+bytes ukua_let_ju         93      # ю  (dormant; parked on ù/f9 -> /u/ for now)
+bytes ukua_let_ja         8f      # я  (dormant; parked on æ/e6 -> /a/ for now)
 # What each letter says, in the phone statement's own codes (phonemes.py
 # prints them). These are all Italian's own phonemes -- ukua adds no phoneme of
 # its own, so every one already has its rule and its formant loci. Where

@@ -44,6 +44,34 @@ This document tracks the end-to-end development, architecture decisions, current
 > reclaim above (accented-Latin slots, records only) realises the same intent
 > without renumbering any existing code point.
 
+### Checkpoint (2026-09-25): 30/33 letters speaking, real audio in CI
+
+Phase 3 is verified green across all six CI builds and the engine produces real
+Ukrainian audio: `привіт`→`[.0pri.1vit]`, `Слава Україні`→ a 15 004-sample wav,
+and the phrase set→ a 52 360-sample wav. Thirty of the thirty-three Cyrillic
+letters render correctly through the own-arm (`pol_test_own_letters` →
+`apply_pol_letter_rules` in `it_phone.up`), including the two-phone `ї`→`j i`.
+
+Three letters are **parked, pending the Phase-5 G2P layer**, because they cannot
+be voiced by repurposing an Italian letter byte:
+
+- **`я` /ja/ and `ю` /ju/** are iotated (two phones each). Reaching the own-arm
+  needs a latin-1 byte Italian's letter-to-sound leaves untouched, and there is
+  none free: Italian folds every lower-case latin-1 letter (accented vowels to a
+  base; `ð`→d, `þ`→drop, `ß`→ss, `æ`→a, `ø`→c), and the only bytes it ignores —
+  the upper-case block `c0`–`de` — are the thirty non-iotated letters, full.
+  (Proven across five CI rounds relocating the pair onto `e0/e1`, `82/84`,
+  `86/87`, `d7/a2`, `q`/`df`, `þ`/`ð`, and `æ`/`ø`.) They are therefore parked on
+  the bytes Italian folds to their bare nucleus — `я` on `æ` (e6)→`/a/`, `ю` on
+  `ù` (f9)→`/u/` — the right vowel without the `/j/` onset, which Phase 5 adds by
+  expanding `я`→`й+а` and `ю`→`й+у` before letter-to-sound.
+- **`ь`** (soft sign) is silent on a control byte; palatalisation is Phase 5.
+
+The clean fix for all three is the G2P/normalisation layer (Phase 5), not more
+byte juggling. Phase 6 (the stress dictionary) likewise depends on Phase 5: a
+dictionary entry carries stress as the combining-acute character `0xE2`, which
+only takes effect once the G2P layer reads it.
+
 ### Phase 4: RHVoice Phonemes & Formant Locus Rules
 - [ ] Map RHVoice phoneme inventory (6 monophthongs, iotated vowels, hard/soft consonants, affricates) into `ukua.statements` and `ukua.settings`.
 - [ ] Implement formant loci in `lang/ukua/rules/is_val.up` (F1, F2, F3 frequencies, bandwidths, transitions).
