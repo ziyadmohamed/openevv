@@ -329,6 +329,16 @@ jobs:
           build/probe-ukua @phrases.txt ukua-audio/ukua-phrases.wav
           build/probe-ukua @slava.txt ukua-audio/slava-ukraini.wav
 
+          # Controls that partition the silence. Latin text goes through the
+          # Italian chassis' own letter-to-sound and never touches the Cyrillic
+          # dispatch, so if it makes samples the engine and synthesis are fine
+          # and the loss is Cyrillic-specific; if it too is silent, the rule
+          # edits or this build broke letter-to-sound wholesale.
+          echo "=== control: Latin 'test message' (chassis path) ==="
+          build/probe-ukua "test message" ukua-audio/latin.wav p || true
+          echo "=== control: single Latin letter p (phonemes) ==="
+          build/probe-ukua "p" /tmp/latin-p.wav p || true
+
           echo "=== resulting wav sizes ==="
           ls -l ukua-audio/
 
