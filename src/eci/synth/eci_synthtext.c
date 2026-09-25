@@ -261,6 +261,20 @@ static int utf8ToWestern(const char *text, uint32_t len, char *out,
     uint32_t i;
     char *o = out;
 
+    /* Ukrainian's two iotated vowels are one letter each -- я /ja/ and ю /ju/
+       -- but letter-to-sound has no single letter that speaks a glide and a
+       vowel together, and the Italian chain ukua still leans on folds the byte
+       each is parked on (0xe6, 0xf9) to a bare vowel with no /j/ onset. So they
+       are pulled apart here, before any of that runs: я -> й а and ю -> й у,
+       two letters that already speak. This is the G2P layer that sits ahead of
+       letter-to-sound; the soft sign, the apostrophe and the дж/дз digraphs
+       will join it here as they are written. It is gated on ukua alone, so no
+       other language's æ (0xe6) or ù (0xf9) -- Italian's ù above all -- is ever
+       touched. The bytes are the codepoints table's: й 0xcd, а 0xc0, у 0xd8
+       (lang/ukua/delta_codepoints_ukua.c), and the out buffer its callers give
+       is sized for the growth (2*len+1). */
+    const int ukua = l != 0 && l->tag != 0 && strcmp(l->tag, "ukua") == 0;
+
     for (i = 0; i < len; i++) {
         signed char c;
         int32_t want, cp;
@@ -334,7 +348,15 @@ static int utf8ToWestern(const char *text, uint32_t len, char *out,
                 }
             }
         }
-        *o++ = (char)cp;
+        if (ukua && (uint8_t)cp == 0xe6) {        /* я / Я  ->  й а */
+            *o++ = (char)0xcd;
+            *o++ = (char)0xc0;
+        } else if (ukua && (uint8_t)cp == 0xf9) { /* ю / Ю  ->  й у */
+            *o++ = (char)0xcd;
+            *o++ = (char)0xd8;
+        } else {
+            *o++ = (char)cp;
+        }
     }
     return 1;
 }
@@ -379,12 +401,12 @@ static void recodeForSSML(SynthThread *t, const char *text, uint32_t len,
                 cpp_delete(wide);
             }
         } else {
-            char *out = (char *)cpp_new(len + 1);
+            char *out = (char *)cpp_new(2 * len + 1);
 
             if (!out)
                 continue;
             *mbcs_out = out;
-            memset(out, 0, len + 1);
+            memset(out, 0, 2 * len + 1);
             utf8ToWestern(text, len, out, langOf(t));
         }
     }
@@ -445,10 +467,10 @@ THIS void addTextRun(SynthThread *t, char *text, uint32_t len, int32_t seq,
 
         if (mbcs_out == 0 && mapped_out == 0
             && l != 0 && l->codepoints_n > 0) {
-            char *out = (char *)cpp_new(len + 1);
+            char *out = (char *)cpp_new(2 * len + 1);
 
             if (out != 0) {
-                memset(out, 0, len + 1);
+                memset(out, 0, 2 * len + 1);
                 if (utf8ToWestern(text, len, out, l)) {
                     /* Only the buffer changes hands. What is outstanding is
                        counted in characters further down, out of whatever
