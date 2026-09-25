@@ -41,8 +41,10 @@
 0448 dd   # ш
 0449 de   # щ
 044c df   # ь
-044e e0   # ю
-044f e1   # я
+044e 82   # ю  -- byte 82 (Polish's ą slot, code 0xcf): a fall-through "own
+          #    letter", NOT à(e0), which is Italian's lowercase accented a and
+          #    is stripped to bare a before letter-to-sound. See the capitals.
+044f 84   # я  -- byte 84 (Polish's ę slot, code 0xd1), same reasoning as ю
 
 # capitals, each onto the byte of its own lower-case letter
 0410 c0   # А
@@ -76,8 +78,8 @@
 0428 dd   # Ш
 0429 de   # Щ
 042c df   # Ь
-042e e0   # Ю
-042f e1   # Я
+042e 82   # Ю  -> ю's byte
+042f 84   # Я  -> я's byte
 
 # the combining acute the stress dictionary writes after a stressed vowel,
 # and the two apostrophes that stand in for the hard sign before iotated
