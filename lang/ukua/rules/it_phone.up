@@ -551,6 +551,14 @@ rule apply_pol_letter_rules takes 3 from it_phone.obj
     give up
   end
 
+  # DIAGNOSTIC 2026-09-25: unconditional insert to test whether this rule is
+  # reached at all for Cyrillic input. If phonemes appear, the L44 ->
+  # pol_test_own_letters -> L77 chain works and the bug is in the per-arm
+  # matching below. If still silent, the rule is never entered. REMOVE AFTER.
+  call lpta_rpta_loadp addr left addr right
+  call insert_2pt_s 2 1 sym ukua_ph_p 0
+  go to said
+
   # Each arm sets the scan at the letter, asks whether it is this one, and lays
   # its phoneme between the two pointers. The first uses the scan the header
   # left; every one after it sets its own, the way the Polish version did. Five
