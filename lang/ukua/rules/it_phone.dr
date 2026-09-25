@@ -8247,28 +8247,6 @@ label L8 was $X10$90693
   call ZZsavescptr10 arity 2 depth 2
   popreg r1
   popreg r1
-# ukua: own-letter test hoisted ahead of Italian's per-letter arms.
-# Two of our Cyrillic bytes (f0 the eth, fe the thorn) survive the is-letter
-# filter and reach this rule, but Italian catches or drops them before the late
-# pol_test at L44, and the c0-de fall-through block had no free byte left for the
-# two iotated letters. Running pol_test_own_letters here -- before any Italian
-# arm -- catches every Cyrillic letter by our own-arm regardless of byte; a Latin
-# letter or a digit gets answer 1 and falls through to Italian's chain at L9
-# unchanged. Mirrors the L44 block; on a match it goes to the same L77 arm.
-  push reg r6
-  call ZZstarttest54 arity 1 depth 1
-  load movl slotaddr 108 into r0
-  push slotaddr 108
-  push reg r6
-  call ZZlpta_load__setscan_r__1 arity 2 depth 3
-  popn 3
-  cmp testl reg r0 reg r0
-  branch jne to L9
-  push reg r6
-  call pol_test_own_letters arity 1 depth 1
-  cmp testl reg r0 reg r0
-  popreg r1
-  branch je to L77
 label L9 was $X8$90695
   push reg r6
   call ZZstarttest11 arity 1 depth 1

@@ -43,12 +43,12 @@
 044c 86   # ь  -- silent for now (palatalisation is Phase 5). Byte 86 is a
           #    control slot the is-letter filter drops, so ь vanishes exactly
           #    as it did falling through the own-test unspoken.
-044e fe   # ю  -- byte fe (þ). A latin-1 letter that survives the is-letter
-          #    filter and reaches generate_ital_diaphons; Italian has no working
-          #    arm for it, so the hoisted pol_test_own_letters (run before every
-          #    Italian arm -- see it_phone.dr) catches it -> j+u. code 160.
-044f f0   # я  -- byte f0 (ð). Same story: reaches letter-to-sound and is caught
-          #    by the hoisted own-test before Italian's dental arm. code 153.
+044e f8   # ю  -- byte f8 (ø). A latin-1 letter that survives the is-letter
+          #    filter and reaches generate_ital_diaphons; the alphabet leaves it
+          #    saying GAP, so Italian has no arm for it and it falls through to
+          #    the late pol_test_own_letters -> j+u. code 147.
+044f e6   # я  -- byte e6 (æ). Same story: no Italian arm claims it, so it falls
+          #    through to the own-test like the c0-de block -> j+a. code 143.
 
 # capitals, each onto the byte of its own lower-case letter
 0410 c0   # А
@@ -82,8 +82,8 @@
 0428 dd   # Ш
 0429 de   # Щ
 042c 86   # Ь  -> ь's silent byte
-042e fe   # Ю  -> ю's byte
-042f f0   # Я  -> я's byte
+042e f8   # Ю  -> ю's byte
+042f e6   # Я  -> я's byte
 
 # the combining acute the stress dictionary writes after a stressed vowel,
 # and the two apostrophes that stand in for the hard sign before iotated
