@@ -397,6 +397,13 @@ end
 # same letter.
 rule pol_test_own_letters takes 1 from it_phone.obj
   bare
+  # DIAGNOSTIC 2026-09-25: unconditionally claim every letter as "ours". With
+  # the forced insert in apply_pol_letter_rules, this tells us whether L44
+  # reaches this rule at all: if Cyrillic now yields phonemes, the chain
+  # reaches L44 -> here -> L77; if still silent, L44 is never reached for these
+  # codes (they route elsewhere or are dropped before generate_ital_diaphons).
+  # REMOVE AFTER.
+  answer 0
   # Every Cyrillic letter is one of ours: none has a Latin arm to catch it, so
   # the chain always arrives here. Thirty-two of the thirty-three say a sound;
   # the soft sign ь carries none, and is left to fall through and be dropped,
