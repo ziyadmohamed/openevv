@@ -254,9 +254,9 @@ uint8_t ukua_evv_authored_data[] = {
     /* ukua_let_shch, 1 bytes at 446 */
     161,
     /* ukua_let_ju, 1 bytes at 447 */
-    101,
+    97,
     /* ukua_let_ja, 1 bytes at 448 */
-    143,
+    107,
     /* ukua_ph_a, 1 bytes at 449 */
     30,
     /* ukua_ph_b, 1 bytes at 450 */
@@ -321,10 +321,6 @@ uint8_t ukua_evv_authored_data[] = {
     25,31,
     /* ukua_ph_ja, 2 bytes at 484 */
     25,30,
-    /* ukua_exp_ja, 2 bytes at 486 */
-    114,102,
-    /* ukua_exp_ju, 2 bytes at 488 */
-    114,148,
 };
 
 const delta_store ukua_delta_authored_store[] = {
