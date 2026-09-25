@@ -41,10 +41,12 @@
 0448 dd   # ш
 0449 de   # щ
 044c df   # ь
-044e 82   # ю  -- byte 82 (Polish's ą slot, code 0xcf): a fall-through "own
-          #    letter", NOT à(e0), which is Italian's lowercase accented a and
-          #    is stripped to bare a before letter-to-sound. See the capitals.
-044f 84   # я  -- byte 84 (Polish's ę slot, code 0xd1), same reasoning as ю
+044e 86   # ю  -- byte 86 (Polish's ł slot, code 0xd2): a clean "own letter"
+          #    routed through pol_test_own_letters. NOT à(e0) (Italian's accented
+          #    a, stripped to bare a) and NOT ą(82)/ę(84): those are Polish's
+          #    nasal vowels, handled by the phone default + is_sival, so they
+          #    never reach the own-letter arm chain and the ju/ja rules go unrun.
+044f 87   # я  -- byte 87 (Polish's ń slot, code 0xd3), same reasoning as ю
 
 # capitals, each onto the byte of its own lower-case letter
 0410 c0   # А
@@ -78,8 +80,8 @@
 0428 dd   # Ш
 0429 de   # Щ
 042c df   # Ь
-042e 82   # Ю  -> ю's byte
-042f 84   # Я  -> я's byte
+042e 86   # Ю  -> ю's byte
+042f 87   # Я  -> я's byte
 
 # the combining acute the stress dictionary writes after a stressed vowel,
 # and the two apostrophes that stand in for the hard sign before iotated
