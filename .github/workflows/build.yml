@@ -300,61 +300,65 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Build probe-ukua and speak Ukrainian
+      - name: Build probe-ukua and audit Ukrainian phonemes
         run: |
           set -eu
           make -j"$(nproc)" probe LANG=lang/ukua RULES=bytecode
           mkdir -p ukua-audio
 
-          # The bytes must reach probe intact. On a native Linux run argv is
-          # already the UTF-8 the file holds, but the @file path is what the
-          # tree uses everywhere (test/matrix.sh) and is byte-identical under
-          # Wine too, so write the text to files and speak those.
+          # The letter-to-sound is what this audits: each word is spoken in `p'
+          # mode, which reports the phonemes the engine placed rather than any
+          # audio, and the log shows word -> phonemes so a wrong mapping is read
+          # off by eye against the pronunciation in the comment. The @file path
+          # is what the tree uses everywhere (test/matrix.sh) and carries the
+          # UTF-8 bytes intact under Wine too, so every word is spoken from a
+          # file rather than from argv.
+          #
+          # The list spans every letter and the cases Ukrainian turns on:
+          # iotated vowels word-initially (Європа), after a vowel (моя), and
+          # after a consonant (synʲa, where palatalisation is still owed); the
+          # soft sign (день); the apostrophe that blocks it (п'ять); the
+          # digraphs дж and дз; г /ɦ/ against ґ /g/; and щ /ʃtʃ/.
+          phoneme_of () {
+            printf '%s' "$2" > /tmp/w.txt
+            line=$(build/probe-ukua @/tmp/w.txt /tmp/w.wav p 2>/dev/null \
+                   | sed -n 's/^speak: phonemes //p' | tr -d '\r')
+            printf '  %-14s %-24s %s\n' "$1" "$2" "${line:-<none>}"
+          }
+          echo "=== word -> phonemes (expected pronunciation in the source) ==="
+          phoneme_of "привіт"   "Привіт"      # prɪˈwit
+          phoneme_of "дякую"    "дякую"       # ˈdʲakuju
+          phoneme_of "Україна"  "Україна"     # ukrɐˈjinɐ
+          phoneme_of "Київ"     "Київ"        # ˈkɪjiw
+          phoneme_of "слава"    "слава"       # ˈslawa
+          phoneme_of "день"     "день"        # denʲ  (soft sign)
+          phoneme_of "сіль"     "сіль"        # silʲ  (soft sign)
+          phoneme_of "батько"   "батько"      # ˈbatʲko (soft sign mid-word)
+          phoneme_of "Європа"   "Європа"      # jewˈrɔpa (initial є = je)
+          phoneme_of "Юрій"     "Юрій"        # ˈjurij   (initial ю = ju)
+          phoneme_of "яблуко"   "яблуко"      # ˈjabluko (initial я = ja)
+          phoneme_of "їжак"     "їжак"        # jiˈʒak   (initial ї = ji)
+          phoneme_of "моя"      "моя"         # moˈja    (я after a vowel = ja)
+          phoneme_of "читає"    "читає"       # tʃɪˈtaje (є after a vowel = je)
+          phoneme_of "синя"     "синя"        # ˈsɪnʲa   (я after a consonant: palatalisation owed)
+          phoneme_of "п'ять"    "П'ять"       # pjatʲ    (apostrophe keeps the /j/)
+          phoneme_of "м'ясо"    "М'ясо"       # ˈmjaso   (apostrophe)
+          phoneme_of "джерело"  "джерело"     # dʒereˈlo (дж)
+          phoneme_of "дзвін"    "дзвін"       # dzwin    (дз)
+          phoneme_of "гора"     "гора"        # ɦoˈra    (г = ɦ, taken as x)
+          phoneme_of "ґанок"    "ґанок"       # ˈganok   (ґ = g)
+          phoneme_of "хліб"     "хліб"        # xlib     (х = x)
+          phoneme_of "щука"     "щука"        # ˈʃtʃuka  (щ = ʃtʃ)
+          phoneme_of "цар"      "цар"         # tsar     (ц = ts)
+          phoneme_of "чай"      "чай"         # tʃaj     (ч)
+
+          # Whole phrases to wav, kept as the artifact so a change to the sound
+          # can be listened to as well as read.
           printf '%s' "Привіт. Добрий день. Слава Україні. П'ять. М'ясо." > phrases.txt
-          printf '%s' "Привіт" > pryvit.txt
           printf '%s' "Слава Україні" > slava.txt
-
-          echo "=== bytes probe is handed (phrases.txt) ==="
-          od -An -tx1 phrases.txt
-
-          # `p' asks the engine to report the phonemes it placed, so the log
-          # says whether the Cyrillic mapped to sounds at all -- the difference
-          # between an encoding failure and a rules one.
-          echo "=== phonemes for Привіт (via @file) ==="
-          build/probe-ukua @pryvit.txt ukua-audio/pryvit.wav p || true
-          echo "=== phonemes for Привіт (via direct argv, for contrast) ==="
-          build/probe-ukua "Привіт" /tmp/pryvit-argv.wav p || true
-
-          echo "=== speak the phrases and Слава Україні to wav ==="
+          echo "=== speak phrases to wav ==="
           build/probe-ukua @phrases.txt ukua-audio/ukua-phrases.wav
           build/probe-ukua @slava.txt ukua-audio/slava-ukraini.wav
-
-          # Controls that partition the silence. Latin text goes through the
-          # Italian chassis' own letter-to-sound and never touches the Cyrillic
-          # dispatch, so if it makes samples the engine and synthesis are fine
-          # and the loss is Cyrillic-specific; if it too is silent, the rule
-          # edits or this build broke letter-to-sound wholesale.
-          echo "=== control: Latin 'test message' (chassis path) ==="
-          build/probe-ukua "test message" ukua-audio/latin.wav p || true
-          echo "=== control: single Latin letter p (phonemes) ==="
-          build/probe-ukua "p" /tmp/latin-p.wav p || true
-
-          # Decisive partition: feed the exact WESTERN bytes that Привіт should
-          # transcode to (0xd3 0xd4 0xca 0xc2 0xcb 0xd6 = codes 115 125 123 122
-          # 137 139 = п р и в і т) straight in. These are not valid UTF-8, so
-          # utf8ToWestern leaves them untouched and the engine sees the codes
-          # directly, bypassing transcoding. If THIS makes phonemes (p r y v i
-          # t), the byte->phoneme path works and the Cyrillic loss is in
-          # transcoding; if it too is silent, those codes never reach the
-          # letter-to-sound and transcoding is not the culprit.
-          printf '\xd3\xd4\xca\xc2\xcb\xd6' > rawcodes.txt
-          echo "=== control: raw western bytes for пр и в і т (phonemes) ==="
-          od -An -tx1 rawcodes.txt
-          build/probe-ukua @rawcodes.txt /tmp/rawcodes.wav p || true
-          printf '\xd3' > rawp.txt
-          echo "=== control: single raw byte 0xd3 (code 115, п, phonemes) ==="
-          build/probe-ukua @rawp.txt /tmp/rawp.wav p || true
-
           echo "=== resulting wav sizes ==="
           ls -l ukua-audio/
 
