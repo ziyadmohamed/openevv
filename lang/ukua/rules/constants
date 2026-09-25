@@ -188,8 +188,15 @@ bytes ukua_let_ts         7e      # ц  (db, Û)  /ts/
 bytes ukua_let_ch         8c      # ч  (dc, Ü)  /tʃ/
 bytes ukua_let_sh         96      # ш  (dd, Ý)  /ʃ/
 bytes ukua_let_shch       a1      # щ  (de, Þ)  /ʃtʃ/
-bytes ukua_let_ju         9f      # ю  (byte df, freed from ь; code 159)  /ju/
-bytes ukua_let_ja         17      # я  (byte 71 'q', the pol-hook link; code 23)  /ja/
+# я and ю sit on two foreign latin-1 letter bytes -- ð and þ -- that survive the
+# is-letter filter and reach generate_ital_diaphons but that Italian has no
+# working arm for (proven: ð fell into the dental arm, þ dropped). Neither is
+# reachable by the LATE own-test the way the accented block c0-de is, so instead
+# pol_test_own_letters is HOISTED to the front of generate_ital_diaphons (see
+# it_phone.dr) where it runs before every Italian arm and catches these two -- and
+# every other Cyrillic letter -- regardless of byte.
+bytes ukua_let_ju         a0      # ю  (byte fe, þ; code 160)  /ju/
+bytes ukua_let_ja         99      # я  (byte f0, ð; code 153)  /ja/
 # What each letter says, in the phone statement's own codes (phonemes.py
 # prints them). These are all Italian's own phonemes -- ukua adds no phoneme of
 # its own, so every one already has its rule and its formant loci. Where

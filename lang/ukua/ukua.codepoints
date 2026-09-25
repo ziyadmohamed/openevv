@@ -42,16 +42,13 @@
 0449 de   # щ
 044c 86   # ь  -- silent for now (palatalisation is Phase 5). Byte 86 is a
           #    control slot the is-letter filter drops, so ь vanishes exactly
-          #    as it did falling through the own-test unspoken. This frees byte
-          #    df (its old slot) for ю below.
-044e df   # ю  -- byte df (was ь). df is inside the accented-Latin block c0-df
-          #    that falls through every Italian arm to the repurposed q-link and
-          #    pol_test_own_letters -- proven: the c0-df Cyrillic all speak, and
-          #    ь itself fell through here. code 159, so ukua_let_ju is 9f.
-044f 71   # я  -- byte 71 ('q'). Italian never used q, so its dispatch link was
-          #    repointed straight at pol_test_own_letters (see it_phone.up): a
-          #    char arriving as code 23 hits our own-arm unconditionally. This
-          #    is the surest slot there is. code 23, so ukua_let_ja is 17.
+          #    as it did falling through the own-test unspoken.
+044e fe   # ю  -- byte fe (þ). A latin-1 letter that survives the is-letter
+          #    filter and reaches generate_ital_diaphons; Italian has no working
+          #    arm for it, so the hoisted pol_test_own_letters (run before every
+          #    Italian arm -- see it_phone.dr) catches it -> j+u. code 160.
+044f f0   # я  -- byte f0 (ð). Same story: reaches letter-to-sound and is caught
+          #    by the hoisted own-test before Italian's dental arm. code 153.
 
 # capitals, each onto the byte of its own lower-case letter
 0410 c0   # А
@@ -85,8 +82,8 @@
 0428 dd   # Ш
 0429 de   # Щ
 042c 86   # Ь  -> ь's silent byte
-042e df   # Ю  -> ю's byte
-042f 71   # Я  -> я's byte
+042e fe   # Ю  -> ю's byte
+042f f0   # Я  -> я's byte
 
 # the combining acute the stress dictionary writes after a stressed vowel,
 # and the two apostrophes that stand in for the hard sign before iotated
