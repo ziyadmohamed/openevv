@@ -41,14 +41,13 @@
 0448 dd   # ш
 0449 de   # щ
 044c df   # ь
-044e d7   # ю  -- byte d7 (× slot, code 179). Bytes 86/87 sit inside 0x80-0x9f,
-          #    which rz_convertText turns into spaces, so ю/я were being erased
-          #    before letter-to-sound ran at all. d7 is >=0xa0 (survives the
-          #    filter) and is not an accented Latin letter, so Italian's per-letter
-          #    chain has no arm to catch it and it falls through to
-          #    pol_test_own_letters and the ju rule (the path that already carries
-          #    ї -> j+i correctly from the c0-df region).
-044f a2   # я  -- byte a2 (¢ slot, code 163), same reasoning as ю
+044e fe   # ю  -- byte fe (þ slot, code 160). The byte must be a Latin-1 *letter*
+          #    or a built-in is-letter filter drops it before letter-to-sound:
+          #    that is why 86/87 (control) and d7/a2 (× ¢, non-letters) were all
+          #    erased. þ is a letter (survives) and is not a Latin base Italian
+          #    would strip-and-catch (unlike à/á -> a), so it falls through to
+          #    pol_test_own_letters and the ju rule, like the c0-df Cyrillic do.
+044f f0   # я  -- byte f0 (ð slot, code 153), same reasoning as ю
 
 # capitals, each onto the byte of its own lower-case letter
 0410 c0   # А
@@ -82,8 +81,8 @@
 0428 dd   # Ш
 0429 de   # Щ
 042c df   # Ь
-042e d7   # Ю  -> ю's byte
-042f a2   # Я  -> я's byte
+042e fe   # Ю  -> ю's byte
+042f f0   # Я  -> я's byte
 
 # the combining acute the stress dictionary writes after a stressed vowel,
 # and the two apostrophes that stand in for the hard sign before iotated
