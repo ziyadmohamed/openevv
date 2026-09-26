@@ -382,6 +382,17 @@ static int utf8ToWestern(const char *text, uint32_t len, char *out,
             *o++ = (char)0xd8;
         } else if (ukua && (uint8_t)cp == 0x86) { /* ь / Ь  ->  й (glide) */
             *o++ = (char)0xcd;
+        } else if (ukua && cp == 0xc7
+                   && (o == out || uk_boundary((uint8_t)o[-1]))
+                   && (i + 1 >= len || uk_boundary((uint8_t)text[i + 1]))) {
+            /* є standing alone is the word є (/je/, "is/are"), the everyday
+               "у мене є ...". Alone it is named "Ci maiuscola con cediglia" --
+               the same litany as і/в/у/й below -- because it too is parked on
+               an accented byte (0xc7). Inside or starting a word є already
+               speaks (Європа -> /jE.../), so spare it only when lone, expanding
+               to й + е (0xcd 0xc6) = /je/, the way я / ю expand above. */
+            *o++ = (char)0xcd;
+            *o++ = (char)0xc6;
         } else if (ukua
                    && (cp == 0xcb || cp == 0xcd || cp == 0xd8 || cp == 0xc2)
                    && (o == out || uk_boundary((uint8_t)o[-1]))
