@@ -352,6 +352,28 @@ jobs:
           phoneme_of "цар"      "цар"         # tsar     (ц = ts)
           phoneme_of "чай"      "чай"         # tʃaj     (ч)
 
+          # Punctuation and special-character audit. A native reviewer heard
+          # "internal tokens/accents" spoken aloud throughout the demo, which
+          # means a mark that should be a silent pause or an accent is instead
+          # reaching letter-to-sound and being verbalised. p-mode prints the
+          # phonemes placed for each string: a punctuation mark that is a pure
+          # pause prints nothing between the surrounding letters; one that is
+          # spoken prints the phonemes of a word or a spelled name. Alone and
+          # in Ukrainian context, so a mark spoken only between words shows.
+          echo "=== punctuation / special chars -> phonemes ==="
+          phoneme_of "comma"    "так, ні"     # comma should be a pause only
+          phoneme_of "period"   "так. ні"     # sentence break
+          phoneme_of "colon"    "день: світло"# колон? or pause
+          phoneme_of "semic"    "так; ні"
+          phoneme_of "emdash"   "так — ні"    # — U+2014 -> western 0x97
+          phoneme_of "hyphen"   "так - ні"    # ASCII hyphen between spaces
+          phoneme_of "apos"     "п'ю"         # ASCII apostrophe (glide keeper)
+          phoneme_of "rquote"   "п’ю"         # U+2019 -> western 0x92
+          phoneme_of "bang"     "так!"
+          phoneme_of "quest"    "так?"
+          phoneme_of "gwithup"  "ґанку"       # ґ U+0491 -- in codepoints or not?
+          phoneme_of "apostS"   "сім'я"       # apostrophe + я
+
           # Whole phrases to wav, kept as the artifact so a change to the sound
           # can be listened to as well as read.
           printf '%s' "Привіт. Добрий день. Слава Україні. П'ять. М'ясо." > phrases.txt
