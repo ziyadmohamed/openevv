@@ -323,7 +323,8 @@ jobs:
             printf '%s' "$2" > /tmp/w.txt
             line=$(build/probe-ukua @/tmp/w.txt /tmp/w.wav p 2>/dev/null \
                    | sed -n 's/^speak: phonemes //p' | tr -d '\r')
-            printf '  %-14s %-24s %s\n' "$1" "$2" "${line:-<none>}"
+            printf '  %-14s %-24s %s\n' "$1" "$2" "${line:-<none>}" \
+              | tee -a ukua-audio/phonemes.txt
           }
           echo "=== word -> phonemes (expected pronunciation in the source) ==="
           phoneme_of "привіт"   "Привіт"      # prɪˈwit
