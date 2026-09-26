@@ -366,7 +366,53 @@ jobs:
           echo "=== speak phrases to wav ==="
           build/probe-ukua @phrases.txt ukua-audio/ukua-phrases.wav
           build/probe-ukua @slava.txt ukua-audio/slava-ukraini.wav
-          build/probe-ukua @demo.txt ukua-audio/ukua-demo.wav
+          # The whole paragraph in one utterance. This is the one that came
+          # back truncated (~3.86s) whatever the poll cap, so keep it for
+          # comparison but do not rely on it for the deliverable below.
+          build/probe-ukua @demo.txt ukua-audio/ukua-demo-single.wav
+
+          # Diagnose and deliver at once. Each sentence is spoken on its own,
+          # its sample count printed, and the per-sentence wavs are stitched
+          # into one long file. If a single addText truncates a long text, the
+          # sum of the parts here will exceed the single utterance above, and
+          # any one sentence that comes back empty or tiny names the offender.
+          sents=(
+            "Привіт!"
+            "Мене звати Юрій, і я родом з України."
+            "Сьогодні чудовий день: світить сонце, співають пташки, і мені дуже гарно."
+            "Я живу в Києві, п'ю каву щоранку та читаю цікаві книжки."
+            "Моя сім'я велика й дружна."
+            "Мій друг любить подорожувати — він був у Львові, Одесі й Харкові."
+            "У старому саду дзвенить бджола, а на ґанку спить кіт."
+            "Дякую, що слухаєш українську мову."
+            "Слава Україні!"
+          )
+          echo "=== per-sentence sample counts ==="
+          parts=()
+          i=0
+          for s in "${sents[@]}"; do
+            printf '%s' "$s" > "sent_$i.txt"
+            build/probe-ukua "@sent_$i.txt" "ukua-audio/sent_$i.wav"
+            parts+=("ukua-audio/sent_$i.wav")
+            i=$((i+1))
+          done
+          echo "=== stitch sentences into ukua-demo.wav ==="
+          python3 - "ukua-audio/ukua-demo.wav" "${parts[@]}" <<'PY'
+          import sys, wave
+          out, ins = sys.argv[1], sys.argv[2:]
+          gap = b"\x00\x00" * int(11025 * 0.25)   # 250 ms of silence between
+          rate = 11025
+          frames = []
+          for p in ins:
+              w = wave.open(p, "rb"); rate = w.getframerate()
+              frames.append(w.readframes(w.getnframes())); w.close()
+          pcm = gap.join(frames)
+          w = wave.open(out, "wb")
+          w.setnchannels(1); w.setsampwidth(2); w.setframerate(rate)
+          w.writeframes(pcm); w.close()
+          print("stitched %d parts -> %s, %.2fs"
+                % (len(ins), out, len(pcm) / (rate * 2.0)))
+          PY
           echo "=== resulting wav sizes ==="
           ls -l ukua-audio/
 
