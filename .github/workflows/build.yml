@@ -374,13 +374,18 @@ jobs:
           phoneme_of "quest"    "так?"
           phoneme_of "gwithup"  "ґанку"       # ґ U+0491 -- in codepoints or not?
           phoneme_of "apostS"   "сім'я"       # apostrophe + я
-          phoneme_of "colonfix" "день: світло"# after the fix: colon -> pause
-          phoneme_of "digits"   "рік 2024"    # do digits spell out / spell-mode?
-          phoneme_of "parens"   "так (ні)"    # parentheses
-          phoneme_of "guillem"  "«текст»"     # « » U+00AB/BB Ukrainian quotes
-          phoneme_of "lowquote" "„текст“"     # „ “ U+201E/201C
-          phoneme_of "ellipsis" "так…"        # … U+2026
-          phoneme_of "endash"   "так – ні"    # – U+2013 en-dash
+          # Isolate the accent-name litany. Folding the colon to a comma did
+          # not remove it, so the colon is not the trigger. „текст“ triggers it
+          # and «текст» does not, so a specific character sends the chain into
+          # a spell-out. Speak each part alone to find it.
+          phoneme_of "svitlo"   "світло"      # the word after the colon, alone
+          phoneme_of "dn_space" "день світло" # same two words, space not colon
+          phoneme_of "dn_comma" "день, світло"# explicit comma typed in
+          phoneme_of "tekst"    "текст"       # the word inside the quotes, alone
+          phoneme_of "lowq_op"  "„"           # „ U+201E alone
+          phoneme_of "lowq_cl"  "“"           # “ U+201C alone
+          phoneme_of "guil_op"  "«"           # « U+00AB alone (clean in context)
+          phoneme_of "latcolon" "abc: def"    # colon in Latin context
 
           # Whole phrases to wav, kept as the artifact so a change to the sound
           # can be listened to as well as read.
