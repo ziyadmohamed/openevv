@@ -396,6 +396,11 @@ jobs:
           phoneme_of "in_v"  "вода"
           phoneme_of "in_u"  "друг"    # у inside
           phoneme_of "apos_v" "в'юн"   # в + apostrophe: NOT lone, must stay в
+          echo "=== з proclitic glue: lone з now clings to the next word ==="
+          phoneme_of "z_init_zub"  "зуб"          # з word-initial: expect /z/ onset
+          phoneme_of "z_init_zyma" "зима"         # з word-initial before и
+          phoneme_of "z_space"     "з України"    # lone з + space: now glued -> /zukra.../
+          phoneme_of "z_phrase"    "родом з України"  # the d1 fragment that was <none>
           echo "=== the nine demo sentences: litany must be gone ==="
           phoneme_of "d1" "Мене звати Юрій, і я родом з України."
           phoneme_of "d2" "Сьогодні чудовий день: світить сонце, співають пташки, і мені дуже гарно."

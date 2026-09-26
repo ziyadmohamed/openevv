@@ -393,6 +393,20 @@ static int utf8ToWestern(const char *text, uint32_t len, char *out,
                to й + е (0xcd 0xc6) = /je/, the way я / ю expand above. */
             *o++ = (char)0xcd;
             *o++ = (char)0xc6;
+        } else if (ukua && cp == 0xc9
+                   && (o == out || uk_boundary((uint8_t)o[-1]))
+                   && i + 1 < len && text[i + 1] == ' ') {
+            /* з standing alone is the preposition з (/z/, "from / with"),
+               "родом з України". A lone consonant makes no syllable, so the
+               engine spoke nothing for it -- the preposition simply vanished,
+               and the whole utterance came back empty in phoneme mode. з is a
+               proclitic: it never stands as its own syllable but leans on the
+               next word ("з України" -> /zukrajiny/). So emit it and swallow
+               the following space, fusing з onto that word as a /z/ onset.
+               Only when it is a lone word before a space; inside a word (звук,
+               дзвін) the byte is an ordinary letter the chain already voices. */
+            *o++ = (char)0xc9;
+            i++;                       /* the space is now part of this word */
         } else if (ukua
                    && (cp == 0xcb || cp == 0xcd || cp == 0xd8 || cp == 0xc2)
                    && (o == out || uk_boundary((uint8_t)o[-1]))
