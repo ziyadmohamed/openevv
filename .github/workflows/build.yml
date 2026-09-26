@@ -374,6 +374,13 @@ jobs:
           phoneme_of "quest"    "так?"
           phoneme_of "gwithup"  "ґанку"       # ґ U+0491 -- in codepoints or not?
           phoneme_of "apostS"   "сім'я"       # apostrophe + я
+          phoneme_of "colonfix" "день: світло"# after the fix: colon -> pause
+          phoneme_of "digits"   "рік 2024"    # do digits spell out / spell-mode?
+          phoneme_of "parens"   "так (ні)"    # parentheses
+          phoneme_of "guillem"  "«текст»"     # « » U+00AB/BB Ukrainian quotes
+          phoneme_of "lowquote" "„текст“"     # „ “ U+201E/201C
+          phoneme_of "ellipsis" "так…"        # … U+2026
+          phoneme_of "endash"   "так – ні"    # – U+2013 en-dash
 
           # Whole phrases to wav, kept as the artifact so a change to the sound
           # can be listened to as well as read.

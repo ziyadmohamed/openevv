@@ -288,7 +288,15 @@ static int utf8ToWestern(const char *text, uint32_t len, char *out,
         uint32_t m;
 
         if ((uint8_t)text[i] < 0x80) {
-            *o++ = text[i];
+            /* A colon sends the Italian chain into a spell-out: instead of the
+               text after it, it reads a legend of accent names aloud -- minus,
+               tilde, circumflex, umlaut, grave, diaeresis -- which is what a
+               Ukrainian listener heard as tokens spoken throughout the demo
+               (день: світло placed [.0ma.0yus.0Tc.1la] "minus", [.0til.1dE]
+               "tilde", [.1la][.0um.1lawt] "umlaut" and the rest). In Ukrainian
+               a colon is only a clause pause, so fold it to a comma before the
+               chain ever sees it. ukua-gated, so Italian keeps its own colon. */
+            *o++ = (ukua && text[i] == ':') ? ',' : text[i];
             continue;
         }
 
