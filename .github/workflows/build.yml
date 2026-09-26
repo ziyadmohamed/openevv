@@ -374,18 +374,21 @@ jobs:
           phoneme_of "quest"    "так?"
           phoneme_of "gwithup"  "ґанку"       # ґ U+0491 -- in codepoints or not?
           phoneme_of "apostS"   "сім'я"       # apostrophe + я
-          # Isolate the accent-name litany. Folding the colon to a comma did
-          # not remove it, so the colon is not the trigger. „текст“ triggers it
-          # and «текст» does not, so a specific character sends the chain into
-          # a spell-out. Speak each part alone to find it.
-          phoneme_of "svitlo"   "світло"      # the word after the colon, alone
-          phoneme_of "dn_space" "день світло" # same two words, space not colon
-          phoneme_of "dn_comma" "день, світло"# explicit comma typed in
-          phoneme_of "tekst"    "текст"       # the word inside the quotes, alone
-          phoneme_of "lowq_op"  "„"           # „ U+201E alone
-          phoneme_of "lowq_cl"  "“"           # “ U+201C alone
-          phoneme_of "guil_op"  "«"           # « U+00AB alone (clean in context)
-          phoneme_of "latcolon" "abc: def"    # colon in Latin context
+          # A comma before certain words sends the chain into the accent-name
+          # spell-out (день, світло) while before others it is a clean pause
+          # (так, ні). Map which second word triggers it: vary length, initial
+          # letter, ending, and split день-side (ь->й) from світло-side.
+          phoneme_of "cm_svitlo" "а, світло"
+          phoneme_of "cm_sonce"  "а, сонце"
+          phoneme_of "cm_voda"   "а, вода"
+          phoneme_of "cm_dim"    "а, дім"
+          phoneme_of "cm_knyga"  "а, книга"
+          phoneme_of "cm_ni"     "а, ні"
+          phoneme_of "cm_vikno"  "а, вікно"
+          phoneme_of "cm_mova"   "а, мова"
+          phoneme_of "cm_drug"   "а, друг"
+          phoneme_of "cm_den_ni" "день, ні"
+          phoneme_of "cm_tak_sv" "так, світло"
 
           # Whole phrases to wav, kept as the artifact so a change to the sound
           # can be listened to as well as read.
