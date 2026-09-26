@@ -48,3 +48,6 @@ lang/*/provenance-sites-*.txt
 # the rules a build compiles are made from the text beside them.
 lang/*/rules/et_phone.up
 lang/*/rules/constants.letters
+
+# CI-downloaded demo audio (reproducible artifacts, not source)
+artifacts/
