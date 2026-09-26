@@ -374,33 +374,27 @@ jobs:
           phoneme_of "quest"    "так?"
           phoneme_of "gwithup"  "ґанку"       # ґ U+0491 -- in codepoints or not?
           phoneme_of "apostS"   "сім'я"       # apostrophe + я
-          # ROOT CAUSE of the reviewer's spelled-out accent litany: the byte
-          # '#' (0x23), and the fancy quote marks, flip the Italian chain into a
-          # mode that NAMES each following character -- "C maiuscola con tilde,
-          # A maiuscola con accento circonflesso ..." -- and since Ukrainian
-          # sits on accented-Latin bytes it narrates every one. The earlier
-          # "день, світло" trigger was a probe artifact: a '#' inline comment
-          # with no leading space got appended to the text. No demo sentence
-          # contains '#', so the real question is whether any of the nine
-          # sentences of the delivered demo trip a trigger. Probe each in p-mode
-          # -- a spelled-out litany prints a long run of TE/tilde/umlaut phones.
-          echo "=== demo sentences -> phonemes (litany must not appear) ==="
-          phoneme_of "d0" "Привіт!"
-          phoneme_of "d1" "Мене звати Юрій, і я родом з України."
-          phoneme_of "d2" "Сьогодні чудовий день: світить сонце, співають пташки, і мені дуже гарно."
-          phoneme_of "d3" "Я живу в Києві, п'ю каву щоранку та читаю цікаві книжки."
-          phoneme_of "d4" "Моя сім'я велика й дружна."
-          phoneme_of "d5" "Мій друг любить подорожувати — він був у Львові, Одесі й Харкові."
-          phoneme_of "d6" "У старому саду дзвенить бджола, а на ґанку спить кіт."
-          phoneme_of "d7" "Дякую, що слухаєш українську мову."
-          phoneme_of "d8" "Слава Україні!"
-          # Settle the raw colon the colon->comma fold obscured: with the fold
-          # still in place день: prints as день, ; a control here confirms a bare
-          # colon between real words is a clean pause, not a trigger.
-          echo "=== trigger chars, correctly spaced (litany expected only here) ==="
-          phoneme_of "hash"   "день #світло"   # the real trigger: 0x23
-          phoneme_of "ldq"    "«світло»"       # guillemets name themselves
-          phoneme_of "lowdq"  "„світло“"       # low-9 / left double quotes
+          # THE REAL ROOT CAUSE, from the demo phonemes: a STANDALONE single
+          # Cyrillic letter -- і в у й а о з, the commonest Ukrainian words
+          # (and/in/from/I) -- is looked up in ital_char_name and SPOKEN AS ITS
+          # ITALIAN NAME. Since each rides an accented-Latin byte the name is
+          # "i maiuscola con accento acuto", "c maiuscola sbarrata", etc. That is
+          # the litany the reviewer heard "throughout": it lands on the tiny
+          # function words that pepper every sentence (d2 "...і мені", d3 "...в
+          # Києві", d5 "...у Львові", d4 "...й дружна"). A single letter INSIDE a
+          # word is fine (світло, вікно); only a lone one is named. я/ю already
+          # dodge this because they expand to two bytes (йа/йу) -- "Я живу"->[.1ya].
+          # Confirm exactly which lone letters trigger, and test whether a lone
+          # plain ASCII letter pronounces instead of spelling (the G2P fix path:
+          # map a standalone Cyrillic vowel-word to its ASCII twin).
+          echo "=== standalone single Cyrillic letters (each should NOT spell) ==="
+          for w in і в у й а о з я є ї; do phoneme_of "lone_$w" "$w"; done
+          echo "=== same letter inside a word (control: these are clean) ==="
+          phoneme_of "in_i"  "мені"   # і inside
+          phoneme_of "in_v"  "вода"   # в onset
+          echo "=== lone plain ASCII letters: do they pronounce or spell? ==="
+          for w in i a o u e z v y; do phoneme_of "ascii_$w" "$w"; done
+
 
           # Whole phrases to wav, kept as the artifact so a change to the sound
           # can be listened to as well as read.
