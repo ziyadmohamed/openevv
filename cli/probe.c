@@ -387,11 +387,15 @@ int main(int argc, char **argv)
     }
 
     /* Nothing drains the engine's message queue by itself; asking whether it
-       is still speaking is what pumps it, so keep asking. */
+       is still speaking is what pumps it, so keep asking. The ceiling is only
+       a guard against a hang: a case that finishes leaves the moment eo_speaking
+       goes false, so short cases are untouched by how high it sits. It is high
+       enough that a long paragraph under the bytecode interpreter -- slower than
+       real time -- is spoken to the end rather than cut partway. */
     {
         int i;
 
-        for (i = 0; i < 3000 && eo_speaking(h); i++)
+        for (i = 0; i < 30000 && eo_speaking(h); i++)
             nap(10);
     }
 
