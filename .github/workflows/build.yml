@@ -356,9 +356,17 @@ jobs:
           # can be listened to as well as read.
           printf '%s' "Привіт. Добрий день. Слава Україні. П'ять. М'ясо." > phrases.txt
           printf '%s' "Слава Україні" > slava.txt
+          # A connected paragraph, so the engine can be judged on running
+          # Ukrainian rather than isolated words. It leans on every case the
+          # letter-to-sound turns on: iotated я/ю/є/ї word-initially, after a
+          # vowel and after a consonant; the soft sign ь (Сьогодні, любить);
+          # the apostrophe that keeps the glide (п'ю, сім'я); the digraphs дж
+          # (бджола) and дз (дзвенить); ґ against г and х; and щ/ц/ч.
+          printf '%s' "Привіт! Мене звати Юрій, і я родом з України. Сьогодні чудовий день: світить сонце, співають пташки, і мені дуже гарно. Я живу в Києві, п'ю каву щоранку та читаю цікаві книжки. Моя сім'я велика й дружна. Мій друг любить подорожувати — він був у Львові, Одесі й Харкові. У старому саду дзвенить бджола, а на ґанку спить кіт. Дякую, що слухаєш українську мову. Слава Україні!" > demo.txt
           echo "=== speak phrases to wav ==="
           build/probe-ukua @phrases.txt ukua-audio/ukua-phrases.wav
           build/probe-ukua @slava.txt ukua-audio/slava-ukraini.wav
+          build/probe-ukua @demo.txt ukua-audio/ukua-demo.wav
           echo "=== resulting wav sizes ==="
           ls -l ukua-audio/
 
