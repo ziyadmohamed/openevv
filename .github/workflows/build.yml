@@ -374,18 +374,33 @@ jobs:
           phoneme_of "quest"    "так?"
           phoneme_of "gwithup"  "ґанку"       # ґ U+0491 -- in codepoints or not?
           phoneme_of "apostS"   "сім'я"       # apostrophe + я
-          # Every "X, світло" was clean except день, світло, and день, ні was
-          # clean too -- so the trigger needs день (which ends ь->й = 0xcd) AND
-          # світло together. Split it: does a ь->й ending matter (сіль vs рік),
-          # and does the св onset of the second word matter (свято vs вода)?
-          phoneme_of "den_svit"  "день, світло"  # reproduce the trigger
-          phoneme_of "sil_svit"  "сіль, світло"  # first word also ends ь->й
-          phoneme_of "rik_svit"  "рік, світло"   # first word ends к, no й
-          phoneme_of "nich_svit" "ніч, світло"   # first word ends ч, no й
-          phoneme_of "den_voda"  "день, вода"    # день + non-св word
-          phoneme_of "den_sonce" "день, сонце"   # день + с (not св)
-          phoneme_of "den_svyat" "день, свято"   # день + another св word
-          phoneme_of "den_svtyt" "день: світить" # the actual demo bigram
+          # ROOT CAUSE of the reviewer's spelled-out accent litany: the byte
+          # '#' (0x23), and the fancy quote marks, flip the Italian chain into a
+          # mode that NAMES each following character -- "C maiuscola con tilde,
+          # A maiuscola con accento circonflesso ..." -- and since Ukrainian
+          # sits on accented-Latin bytes it narrates every one. The earlier
+          # "день, світло" trigger was a probe artifact: a '#' inline comment
+          # with no leading space got appended to the text. No demo sentence
+          # contains '#', so the real question is whether any of the nine
+          # sentences of the delivered demo trip a trigger. Probe each in p-mode
+          # -- a spelled-out litany prints a long run of TE/tilde/umlaut phones.
+          echo "=== demo sentences -> phonemes (litany must not appear) ==="
+          phoneme_of "d0" "Привіт!"
+          phoneme_of "d1" "Мене звати Юрій, і я родом з України."
+          phoneme_of "d2" "Сьогодні чудовий день: світить сонце, співають пташки, і мені дуже гарно."
+          phoneme_of "d3" "Я живу в Києві, п'ю каву щоранку та читаю цікаві книжки."
+          phoneme_of "d4" "Моя сім'я велика й дружна."
+          phoneme_of "d5" "Мій друг любить подорожувати — він був у Львові, Одесі й Харкові."
+          phoneme_of "d6" "У старому саду дзвенить бджола, а на ґанку спить кіт."
+          phoneme_of "d7" "Дякую, що слухаєш українську мову."
+          phoneme_of "d8" "Слава Україні!"
+          # Settle the raw colon the colon->comma fold obscured: with the fold
+          # still in place день: prints as день, ; a control here confirms a bare
+          # colon between real words is a clean pause, not a trigger.
+          echo "=== trigger chars, correctly spaced (litany expected only here) ==="
+          phoneme_of "hash"   "день #світло"   # the real trigger: 0x23
+          phoneme_of "ldq"    "«світло»"       # guillemets name themselves
+          phoneme_of "lowdq"  "„світло“"       # low-9 / left double quotes
 
           # Whole phrases to wav, kept as the artifact so a change to the sound
           # can be listened to as well as read.
