@@ -250,6 +250,21 @@ static void utf8ToWide(const char *text, uint32_t len, uint16_t *out)
     }
 }
 
+/* Is this byte a word boundary -- something that ends one word and is not part
+   of the next? Space and punctuation are; a letter is not, and neither is the
+   apostrophe, which in Ukrainian joins letters inside one word (п'ять, в'юн,
+   з'їзд), nor any high byte, which is a Cyrillic-on-Western or accented letter.
+   Used only to spot a single Cyrillic letter standing alone as a whole word. */
+static int uk_boundary(uint8_t b)
+{
+    if (b == 0x27)                 return 0;   /* apostrophe joins letters */
+    if (b >= 0x80)                 return 0;   /* a letter, in the West set */
+    if (b >= 'a' && b <= 'z')      return 0;
+    if (b >= 'A' && b <= 'Z')      return 0;
+    if (b >= '0' && b <= '9')      return 0;
+    return 1;                                  /* space or punctuation */
+}
+
 /* UTF-8 to single bytes, for when there is no romanizer to do it.
 
    Answers whether the text really was UTF-8. It it was not, the caller's own
@@ -288,14 +303,11 @@ static int utf8ToWestern(const char *text, uint32_t len, char *out,
         uint32_t m;
 
         if ((uint8_t)text[i] < 0x80) {
-            /* A colon sends the Italian chain into a spell-out: instead of the
-               text after it, it reads a legend of accent names aloud -- minus,
-               tilde, circumflex, umlaut, grave, diaeresis -- which is what a
-               Ukrainian listener heard as tokens spoken throughout the demo
-               (день: світло placed [.0ma.0yus.0Tc.1la] "minus", [.0til.1dE]
-               "tilde", [.1la][.0um.1lawt] "umlaut" and the rest). In Ukrainian
-               a colon is only a clause pause, so fold it to a comma before the
-               chain ever sees it. ukua-gated, so Italian keeps its own colon. */
+            /* A colon between words can be read out by name -- ital_char_name
+               has ':' -> "due punti" -- the same way the lone-letter words
+               below are named rather than spoken. In Ukrainian a colon is only
+               a clause pause, so fold it to a comma before the chain can name
+               it. ukua-gated, so Italian keeps its own colon. */
             *o++ = (ukua && text[i] == ':') ? ',' : text[i];
             continue;
         }
@@ -370,6 +382,26 @@ static int utf8ToWestern(const char *text, uint32_t len, char *out,
             *o++ = (char)0xd8;
         } else if (ukua && (uint8_t)cp == 0x86) { /* ь / Ь  ->  й (glide) */
             *o++ = (char)0xcd;
+        } else if (ukua
+                   && (cp == 0xcb || cp == 0xcd || cp == 0xd8 || cp == 0xc2)
+                   && (o == out || uk_boundary((uint8_t)o[-1]))
+                   && (i + 1 >= len || uk_boundary((uint8_t)text[i + 1]))) {
+            /* A single Cyrillic letter standing alone is a whole word here --
+               і в у й, the commonest Ukrainian words (and / in / and / from-in)
+               -- but alone it is looked up in ital_char_name and SPOKEN AS ITS
+               ITALIAN NAME, since each is parked on an accented-Latin byte: і
+               (0xcb) "eh maiuscola con la umlaut", в (0xc2) "ah maiuscola con
+               accento circonflesso", у (0xd8) "c maiuscola sbarrata", й (0xcd)
+               "ih maiuscola con accento acuto". That naming is the litany a
+               native listener heard throughout the demo, landing on the tiny
+               function words in every sentence. A lone plain vowel is spoken,
+               not named, so map each to the ASCII vowel that speaks its sound:
+               і, й -> i (/i/; й as a conjunction is і); в, у -> u (/u/; the
+               preposition в is /w/, the vowelless twin of у). Only when the
+               letter is alone -- inside a word these bytes are ordinary letters
+               (світло, вода) and letter-to-sound handles them. я/ю/ь above are
+               already spared, expanding to two bytes before they reach here. */
+            *o++ = (cp == 0xcb || cp == 0xcd) ? 'i' : 'u';
         } else {
             *o++ = (char)cp;
         }

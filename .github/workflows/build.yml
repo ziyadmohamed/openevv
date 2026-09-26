@@ -374,26 +374,33 @@ jobs:
           phoneme_of "quest"    "так?"
           phoneme_of "gwithup"  "ґанку"       # ґ U+0491 -- in codepoints or not?
           phoneme_of "apostS"   "сім'я"       # apostrophe + я
-          # THE REAL ROOT CAUSE, from the demo phonemes: a STANDALONE single
-          # Cyrillic letter -- і в у й а о з, the commonest Ukrainian words
-          # (and/in/from/I) -- is looked up in ital_char_name and SPOKEN AS ITS
-          # ITALIAN NAME. Since each rides an accented-Latin byte the name is
-          # "i maiuscola con accento acuto", "c maiuscola sbarrata", etc. That is
-          # the litany the reviewer heard "throughout": it lands on the tiny
-          # function words that pepper every sentence (d2 "...і мені", d3 "...в
-          # Києві", d5 "...у Львові", d4 "...й дружна"). A single letter INSIDE a
-          # word is fine (світло, вікно); only a lone one is named. я/ю already
-          # dodge this because they expand to two bytes (йа/йу) -- "Я живу"->[.1ya].
-          # Confirm exactly which lone letters trigger, and test whether a lone
-          # plain ASCII letter pronounces instead of spelling (the G2P fix path:
-          # map a standalone Cyrillic vowel-word to its ASCII twin).
-          echo "=== standalone single Cyrillic letters (each should NOT spell) ==="
+          # FIX VERIFICATION. A standalone single Cyrillic letter -- і в у й,
+          # the commonest Ukrainian words (and/in/and/from-in) -- was looked up
+          # in ital_char_name and SPOKEN AS ITS ITALIAN NAME ("ih maiuscola con
+          # accento acuto" ...), because each rides an accented-Latin byte. That
+          # naming is the litany a native listener heard throughout the demo,
+          # landing on the tiny function words in every sentence. utf8ToWestern
+          # now maps a LONE і/й -> ASCII i and a lone в/у -> ASCII u (plain
+          # vowels are spoken, not named); inside a word the bytes are untouched.
+          # Expect: lone і->[.1i], й->[.1i], в->[.1u], у->[.1u]; а/о/я/ї still
+          # clean; з still <none> and є still named (no ASCII vowel twin -- left
+          # for a dictionary follow-up). The nine demo sentences must show NO
+          # spelled-out run (maiuscola/umlaut/circonflesso) any more.
+          echo "=== lone single letters after the fix ==="
           for w in і в у й а о з я є ї; do phoneme_of "lone_$w" "$w"; done
-          echo "=== same letter inside a word (control: these are clean) ==="
-          phoneme_of "in_i"  "мені"   # і inside
-          phoneme_of "in_v"  "вода"   # в onset
-          echo "=== lone plain ASCII letters: do they pronounce or spell? ==="
-          for w in i a o u e z v y; do phoneme_of "ascii_$w" "$w"; done
+          echo "=== controls: same letter inside a word stays a letter ==="
+          phoneme_of "in_i"  "мені"
+          phoneme_of "in_v"  "вода"
+          phoneme_of "in_u"  "друг"    # у inside
+          phoneme_of "apos_v" "в'юн"   # в + apostrophe: NOT lone, must stay в
+          echo "=== the nine demo sentences: litany must be gone ==="
+          phoneme_of "d1" "Мене звати Юрій, і я родом з України."
+          phoneme_of "d2" "Сьогодні чудовий день: світить сонце, співають пташки, і мені дуже гарно."
+          phoneme_of "d3" "Я живу в Києві, п'ю каву щоранку та читаю цікаві книжки."
+          phoneme_of "d4" "Моя сім'я велика й дружна."
+          phoneme_of "d5" "Мій друг любить подорожувати — він був у Львові, Одесі й Харкові."
+          phoneme_of "d6" "У старому саду дзвенить бджола, а на ґанку спить кіт."
+
 
 
           # Whole phrases to wav, kept as the artifact so a change to the sound
